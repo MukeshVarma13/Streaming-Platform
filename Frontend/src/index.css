@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+body {
+  background: #000000;
+  /* background: #0d162e; */
+  color: white;
+  height: 100vh;
+}
+
+.no-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}
+
+.bg-theme {
+  /* background: #0d162e; */
+  background-color: rgba(7, 6, 6, 0.966);
+}
+
+.body-theme {
+  /* background: #0F1429; */
+  background-color: rgba(7, 6, 6, 0.99);
+}
+
+.mix-grade {
+  background: linear-gradient(to top right, #8b0db4, #f20a92);
+}
+
+.hover-theme {
+  /* background: #353456; */
+  background: rgba(19, 18, 18, 0.98);
+}
+.mix-grade2 {
+  /* background: linear-gradient(to bottom,#F20A92, #0d162e); */
+  background: linear-gradient(to bottom, #f20a92, #000);
+}
