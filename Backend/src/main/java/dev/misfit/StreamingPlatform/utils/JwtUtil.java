@@ -34,7 +34,7 @@ public class JwtUtil {
                 .subject(subject)
                 .issuer("MVR")
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60  * 10))
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60  * 100))
                 .and()
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();

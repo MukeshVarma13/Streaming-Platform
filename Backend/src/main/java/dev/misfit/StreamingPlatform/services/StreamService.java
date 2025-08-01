@@ -4,6 +4,7 @@ import dev.misfit.StreamingPlatform.entities.Stream;
 import dev.misfit.StreamingPlatform.io.StreamRequest;
 import dev.misfit.StreamingPlatform.io.StreamResponse;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,6 @@ public interface StreamService {
 
     String generateStreamKey();
 
-    StreamResponse startStream(StreamRequest request) throws Exception;
+    StreamResponse startStream(StreamRequest request, MultipartFile thumbnail) throws Exception;
 }
 

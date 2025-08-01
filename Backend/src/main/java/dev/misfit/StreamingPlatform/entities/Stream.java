@@ -26,6 +26,7 @@ public class Stream {
     private Instant startedAt;
     private Instant endedAt;
     private int likes;
+    private String thumbnail;
     @ManyToOne
     @JoinColumn(name = "streamer_id", nullable = false)
     private User streamer;

@@ -2,7 +2,7 @@
 
 body {
   background: #000000;
-  /* background: #0d162e; */
+  /* background: #0c1122; */
   color: white;
   height: 100vh;
 }
@@ -22,7 +22,7 @@ body {
 }
 
 .body-theme {
-  /* background: #0F1429; */
+  /* background: #0c1122; */
   background-color: rgba(7, 6, 6, 0.99);
 }
 
@@ -35,6 +35,14 @@ body {
   background: rgba(19, 18, 18, 0.98);
 }
 .mix-grade2 {
-  /* background: linear-gradient(to bottom,#F20A92, #0d162e); */
+  /* background: linear-gradient(to bottom,#F20A92, #0c1122); */
   background: linear-gradient(to bottom, #f20a92, #000);
+}
+
+/* .active{
+  color: #F20A92;
+} */
+
+.text-grade {
+  color: #f20a92;
 }

@@ -16,7 +16,7 @@ public class WatchStreamVideosController {
         this.watchStreamVideos = watchStreamVideos;
     }
 
-    //   To watch the stream video
+    //   To watch the stream video of that streamer just like channel view
     @GetMapping("/streamer-detail/{streamerId}")
     public ResponseEntity<StreamUserResponse> watchStream(@PathVariable Long streamerId) throws Exception {
         return ResponseEntity.ok(watchStreamVideos.getStreamerDetails(streamerId));

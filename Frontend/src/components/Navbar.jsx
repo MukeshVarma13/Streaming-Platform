@@ -24,7 +24,7 @@ const Navbar = () => {
       <div className="w-full flex flex-col gap-3">
         <NavLink className="flex gap-6 w-full opacity-60 py-2 pl-5 pr-14 hover:bg-gray-500 hover:border-r-4 rounded border-r-pink-500">
           <MdOutlineHome size={22} />
-          <span className="text-sm">Home Page</span>
+          <span className="text-sm">Home</span>
         </NavLink>
         <NavLink className="flex gap-6 w-full opacity-60 py-2 pl-5 pr-14 hover:bg-gray-500 hover:border-r-4 rounded border-r-pink-500">
           <BiCategory size={22} />

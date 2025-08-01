@@ -17,4 +17,5 @@ public class StreamResponse {
     private String url;
     private Boolean isLive;
     private Instant startedAt;
+    private String thumbnail;
 }

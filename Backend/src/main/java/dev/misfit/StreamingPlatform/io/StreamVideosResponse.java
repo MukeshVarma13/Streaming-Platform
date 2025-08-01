@@ -22,5 +22,6 @@ public class StreamVideosResponse {
     private Instant startedAt;
     private Instant endedAt;
     private Integer likes;
+    private String thumbnail;
     private StreamUserResponse streamUserResponse;
 }

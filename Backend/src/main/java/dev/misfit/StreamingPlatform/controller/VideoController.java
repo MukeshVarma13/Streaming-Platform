@@ -2,8 +2,8 @@ package dev.misfit.StreamingPlatform.controller;
 
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.MediaTypeFactory;
 import org.springframework.http.ResponseEntity;
@@ -27,18 +27,16 @@ public class VideoController {
     @Value("${videos.path}")
     private String videoUrl;
 
-    @GetMapping("/{streamerId}/{filename}")
-    public ResponseEntity<Resource> getVideo(@PathVariable String streamerId, @PathVariable String filename) throws IOException {
-        Path videoPath = Paths.get(videoUrl, streamerId, filename);
+    @GetMapping("/{streamerId}/{streamKey}/{filename}")
+    public ResponseEntity<Resource> getVideo(@PathVariable String streamerId, @PathVariable String streamKey, @PathVariable String filename) throws IOException {
+        Path videoPath = Paths.get(videoUrl, streamerId, streamKey, filename);
         if (!Files.exists(videoPath)) return ResponseEntity.notFound().build();
 
-        Resource resource = new InputStreamResource(Files.newInputStream(videoPath));
+        Resource resource = new UrlResource(videoPath.toUri());
+        String contentType = filename.endsWith(".m3u8") ? "application/vnd.apple.mpegurl" : filename.endsWith(".ts") ? "video/MP2T" : "application/octet-stream";
 
         return ResponseEntity.ok()
-                .contentLength(Files.size(videoPath))
-                .contentType(MediaTypeFactory
-                        .getMediaType(filename)
-                        .orElse(MediaType.APPLICATION_OCTET_STREAM))
+                .contentType(MediaType.parseMediaType(contentType))
                 .body(resource);
     }
 

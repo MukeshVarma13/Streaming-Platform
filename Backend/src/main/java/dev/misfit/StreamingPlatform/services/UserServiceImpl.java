@@ -50,12 +50,12 @@ public class UserServiceImpl implements UserService {
         Path uploadDir = Path.of(profilePicPath);
         Files.createDirectories(uploadDir);
 
-        String fileName = file.getOriginalFilename();
+        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
         Path filePath = uploadDir.resolve(fileName);
 
         Files.copy(file.getInputStream(), filePath);
 
-        user.setProfilePic(fileName);
+        user.setProfilePic("/profile-pic/" + fileName);
         userRepository.save(user);
         return true;
     }
@@ -89,7 +89,6 @@ public class UserServiceImpl implements UserService {
 
         if (authentication.isAuthenticated()) {
             return LoginResponse.builder()
-                    .profilePic(Files.readAllBytes(profilePath))
                     .token(jwtUtil.generateToken(loginRequest.getEmail(), user.getUserId()))
                     .build();
         }

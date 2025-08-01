@@ -112,6 +112,7 @@ public class StreamVideosServiceImpl implements StreamVideosService {
                 .endedAt(stream.getEndedAt())
                 .likes(stream.getLikes())
                 .streamUserResponse(user)
+                .thumbnail(stream.getThumbnail())
                 .build();
     }
 

@@ -39,6 +39,7 @@ public class WatchStreamVideosServiceImpl implements WatchStreamVideosService {
                 .startedAt(stream.getStartedAt())
                 .endedAt(stream.getEndedAt())
                 .likes(stream.getLikes())
+                .thumbnail(stream.getThumbnail())
                 .build();
     }
 

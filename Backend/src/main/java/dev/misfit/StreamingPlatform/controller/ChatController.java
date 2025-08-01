@@ -19,11 +19,11 @@ public class ChatController {
         this.streamRepository = streamRepository;
     }
 
-    @MessageMapping("/sendMessage/{streamId}")  // Receive from /app/sendMessage
-    @SendTo("/topic/room/{streamId}") // send to subscribers of /topic/room
-    public ChatMessage message(
-            @DestinationVariable Long streamId
-    ){
-
-    }
+//    @MessageMapping("/sendMessage/{streamId}")  // Receive from /app/sendMessage
+//    @SendTo("/topic/room/{streamId}") // send to subscribers of /topic/room
+//    public ChatMessage message(
+//            @DestinationVariable Long streamId
+//    ){
+//
+//    }
 }

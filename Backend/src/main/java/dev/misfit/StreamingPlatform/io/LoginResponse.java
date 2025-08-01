@@ -12,6 +12,5 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor
 @Builder
 public class LoginResponse {
-    private byte[] profilePic;
     private String token;
 }

@@ -7,6 +7,7 @@ import dev.misfit.StreamingPlatform.services.StreamService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -52,8 +53,11 @@ public class StreamController {
 
     //  Get stream details(title, desc, key, etc) and start streaming
     @PostMapping("/stream/start")
-    public ResponseEntity<StreamResponse> startStream(@RequestBody StreamRequest request) throws Exception {
-        StreamResponse response = service.startStream(request);
+    public ResponseEntity<StreamResponse> startStream(
+            @RequestPart("details") StreamRequest request,
+            @RequestPart("thumbnail") MultipartFile thumbnail
+    ) throws Exception {
+        StreamResponse response = service.startStream(request, thumbnail);
         if (response == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }

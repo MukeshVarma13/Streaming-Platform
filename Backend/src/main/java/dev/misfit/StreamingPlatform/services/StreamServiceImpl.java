@@ -10,8 +10,12 @@ import dev.misfit.StreamingPlatform.repositories.StreamRepository;
 import dev.misfit.StreamingPlatform.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Base64;
@@ -53,17 +57,16 @@ public class StreamServiceImpl implements StreamService {
 
         String streamerId = key.getStreamer().getUserId().toString();
 
-        String outputFolder = videoPath + "/" + streamerId;
+        String outputFolder = videoPath + "/" + streamerId + "/" + streamKey;
         new File(outputFolder).mkdirs();
 
-        String wslOutputFolder = wslPath + streamerId;
-        String uniqueKey = streamKey + "_" + System.currentTimeMillis();
+        String wslOutputFolder = wslPath + streamerId + "/" + streamKey;
 
         String wslCommand = String.format(
-                "ffmpeg -y -i $(ls -t /tmp/recordings/%s-*.flv | head -n 1) -c copy %s/%s.mp4",
+                "ffmpeg -y -i $(ls -t /tmp/recordings/%s-*.mp4 | head -n 1) -codec: copy -hls_time 10 -hls_list_size 0 -f hls %s/%s.m3u8",
                 streamKey,
                 wslOutputFolder,
-                uniqueKey
+                streamKey
         );
 
         Process ffmpegProcess = new ProcessBuilder("wsl", "bash", "-c", wslCommand).start();
@@ -73,7 +76,7 @@ public class StreamServiceImpl implements StreamService {
                 System.err.println("FFmpeg failed to convert video.");
             } else {
                 String deleteCommand = String.format(
-                        "rm $(ls -t /tmp/recordings/%s-*.flv | head -n 1)",
+                        "rm $(ls /tmp/recordings/%s-*.mp4)",
                         streamKey
                 );
                 new ProcessBuilder("wsl", "bash", "-c", deleteCommand).start();
@@ -82,7 +85,7 @@ public class StreamServiceImpl implements StreamService {
             throw new ProcessorException(e);
         }
 
-        key.setUrl("/api/videos/" + streamerId + "/" + uniqueKey + ".mp4");
+        key.setUrl("/api/videos/" + streamerId + "/" + streamKey + "/" + streamKey + ".m3u8");
         key.setStreamKey(streamKey);
         streamRepository.save(key);
     }
@@ -95,7 +98,7 @@ public class StreamServiceImpl implements StreamService {
     }
 
     @Override
-    public StreamResponse startStream(StreamRequest request) throws Exception {
+    public StreamResponse startStream(StreamRequest request, MultipartFile thumbnail) throws Exception {
         Optional<User> optionalUser = userRepository.findById(request.getUserId());
         if (optionalUser.isEmpty()) {
             throw new Exception("Invalid user");
@@ -107,7 +110,14 @@ public class StreamServiceImpl implements StreamService {
             throw new StreamKeyExpiredException("Duplicate keys not allowed... Generate new key");
         }
 
-        Stream stream = convertToStream(request);
+        String thumbnailOriginalFilename = thumbnail.getOriginalFilename();
+        String outputFolder = videoPath + "/" + request.getUserId() + "/" + request.getStreamKey();
+        new File(outputFolder).mkdirs();
+        Path path = Path.of(outputFolder, thumbnailOriginalFilename);
+        Files.copy(thumbnail.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+        String thumbnailPath = "/thumbnail/" + request.getUserId() + "/" + request.getStreamKey() + "/" + thumbnailOriginalFilename;
+
+        Stream stream = convertToStream(request, thumbnailPath);
         stream.setStreamer(user);
         streamRepository.save(stream);
         user.getStreams().add(stream);
@@ -124,7 +134,7 @@ public class StreamServiceImpl implements StreamService {
                 .build();
     }
 
-    private Stream convertToStream(StreamRequest request) {
+    private Stream convertToStream(StreamRequest request, String thumbnailPath) {
         return Stream.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
@@ -132,6 +142,7 @@ public class StreamServiceImpl implements StreamService {
                 .startedAt(Instant.now())
                 .streamKey(request.getStreamKey())
                 .url("/hls/" + request.getStreamKey() + ".m3u8")
+                .thumbnail(thumbnailPath)
                 .build();
     }
 }
