@@ -1,4 +1,3 @@
-import React from "react";
 import { Route, Routes } from "react-router";
 import Home from "./pages/Home";
 import Following from "./pages/Following";
@@ -21,7 +20,7 @@ const App = () => {
     <div>
       <Header />
       <Navbar />
-      <div className="pt-[9.2vh] pl-56 mix-grade2 h-56 backdrop-blur-2xl">
+      <div className="pt-[9.2vh] pl-48 mix-grade2 backdrop-blur-2xl w-full h-full">
         <Routes>
           <Route index element={<Home />} />
           <Route path="/following" element={<Following />} />
@@ -30,8 +29,8 @@ const App = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/setting" element={<Settings />} />
-          <Route path="/watchstream" element={<WatchStream />} />
-          <Route path="/trending" element={<Trendding />} />
+          <Route path="/watchstream/:streamId" element={<WatchStream />} />
+          <Route path="/directory/:name" element={<Trendding />} />
           <Route path="login-register" element={<LoginRegister />} />
           <Route path="/edit-profile" element={<EditProfile />} />
           <Route path="/library" element={<Library />} />

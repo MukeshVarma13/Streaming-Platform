@@ -35,10 +35,17 @@ public class WebSecurityConfig {
         http.cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/register", "/login", "/api/auth/publish", "/api/stream/complete", "/api/**").permitAll()
+                        .requestMatchers("/register",
+                                "/login",
+                                "/api/auth/publish",
+                                "/api/stream/complete",
+                                "/api/**",
+                                "/profile-pic/**",
+                                "/thumbnail/**",
+                                "/chat/**").permitAll()
                         .anyRequest()
                         .authenticated())
-                .httpBasic(Customizer.withDefaults())
+                .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

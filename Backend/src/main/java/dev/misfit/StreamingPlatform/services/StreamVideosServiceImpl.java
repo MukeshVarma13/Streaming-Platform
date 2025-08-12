@@ -1,7 +1,9 @@
 package dev.misfit.StreamingPlatform.services;
 
+import dev.misfit.StreamingPlatform.entities.ChatMessage;
 import dev.misfit.StreamingPlatform.entities.Stream;
 import dev.misfit.StreamingPlatform.entities.User;
+import dev.misfit.StreamingPlatform.io.ChatResponse;
 import dev.misfit.StreamingPlatform.io.StreamUserResponse;
 import dev.misfit.StreamingPlatform.io.StreamVideosResponse;
 import dev.misfit.StreamingPlatform.repositories.StreamRepository;
@@ -84,7 +86,7 @@ public class StreamVideosServiceImpl implements StreamVideosService {
         return userRepository
                 .findAll()
                 .stream()
-                .sorted((a,b)-> b.getFollowers() - a.getFollowers())
+                .sorted((a, b) -> b.getFollowers() - a.getFollowers())
                 .map(this::convertToStreamUserResponse)
                 .toList();
     }
@@ -97,6 +99,25 @@ public class StreamVideosServiceImpl implements StreamVideosService {
         }
         Stream stream = streamOptional.get();
         return convertToStreamVideoResponse(stream);
+    }
+
+    @Override
+    public List<ChatResponse> getChatMessages(Long streamId) throws Exception {
+        Optional<Stream> optionalStream = streamRepository.findById(streamId);
+        if (optionalStream.isEmpty()) {
+            throw new Exception("Stream not found!!");
+        }
+        Stream stream = optionalStream.get();
+        return stream.getMessages().stream().map(this::convertToChatResponse).toList();
+    }
+
+    private ChatResponse convertToChatResponse(ChatMessage message) {
+        return ChatResponse.builder()
+                .id(message.getId())
+                .content(message.getContent())
+                .userName(message.getUser().getName())
+                .userProfile(message.getUser().getProfilePic())
+                .build();
     }
 
 

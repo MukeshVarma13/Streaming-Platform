@@ -1,10 +1,17 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=Noto+Sans+TC:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&family=Tajawal:wght@200;300;400;500;700;800;900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
 
 body {
-  background: #000000;
+  background: #0e0e10;
   /* background: #0c1122; */
   color: white;
   height: 100vh;
+  font-family: "Roboto", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100;
 }
 
 .no-scrollbar {
@@ -18,16 +25,16 @@ body {
 
 .bg-theme {
   /* background: #0d162e; */
-  background-color: rgba(7, 6, 6, 0.966);
+  background-color: #1f1f23;
 }
 
 .body-theme {
   /* background: #0c1122; */
-  background-color: rgba(7, 6, 6, 0.99);
+  background-color: #6641a8;
 }
 
 .mix-grade {
-  background: linear-gradient(to top right, #8b0db4, #f20a92);
+  background: linear-gradient(to top right, #8b0db4, #0e0e10);
 }
 
 .hover-theme {
@@ -36,7 +43,7 @@ body {
 }
 .mix-grade2 {
   /* background: linear-gradient(to bottom,#F20A92, #0c1122); */
-  background: linear-gradient(to bottom, #f20a92, #000);
+  /* background: linear-gradient(to bottom, #f20a92, #0e0e10); */
 }
 
 /* .active{
@@ -44,5 +51,5 @@ body {
 } */
 
 .text-grade {
-  color: #f20a92;
+  color: #b994ff;
 }

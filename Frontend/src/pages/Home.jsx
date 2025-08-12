@@ -1,30 +1,27 @@
-import React from "react";
-import Logo from "../components/Logo";
 import MainCarosel from "../components/MainCarosel";
-import RightCarosel from "../components/RightCarosel";
 import VideoList from "../components/VideoList";
 import TopStreamers from "../components/TopStreamers";
 import CategoryComp from "../components/CategoryComp";
 
 const Home = () => {
   return (
-    <div className="h-screen flex flex-col">
-      <div className="flex w-full h-1/2 gap-3">
-        <div className="w-3/4">
+    <div className="h-screen flex flex-col gap-5 pr-4">
+      <div className="flex w-full h-1/3 gap-3">
+        <div className="w-full">
           <MainCarosel />
         </div>
-        <div className="w-full">
-          <RightCarosel title={"Continue Watching"} />
-        </div>
       </div>
-      <div className="mt-6 pr-5">
+      <div className="pr-5">
         <TopStreamers title={"Top Streamers"} />
       </div>
-      <div className="w-full h-1/2 mt-7 pr-5">
+      <div className="w-full h-1/2">
         <VideoList title={"Recommended for you"} />
       </div>
-      <div className="w-full mt-6 pr-5">
+      <div className="w-full py-3">
         <CategoryComp />
+      </div>
+      <div className="w-full h-1/2">
+        <VideoList title={"Live Streaming"} />
       </div>
     </div>
   );

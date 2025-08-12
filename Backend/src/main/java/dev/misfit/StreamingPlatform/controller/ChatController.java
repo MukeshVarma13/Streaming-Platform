@@ -1,7 +1,8 @@
 package dev.misfit.StreamingPlatform.controller;
 
-import dev.misfit.StreamingPlatform.entities.ChatMessage;
-import dev.misfit.StreamingPlatform.repositories.StreamRepository;
+import dev.misfit.StreamingPlatform.io.ChatRequest;
+import dev.misfit.StreamingPlatform.io.ChatResponse;
+import dev.misfit.StreamingPlatform.services.ChatMessageService;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -10,20 +11,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@CrossOrigin
+@CrossOrigin("*")
 public class ChatController {
 
-    private final StreamRepository streamRepository;
+    private final ChatMessageService messageService;
 
-    public ChatController(StreamRepository streamRepository) {
-        this.streamRepository = streamRepository;
+    public ChatController(ChatMessageService messageService) {
+        this.messageService = messageService;
     }
 
-//    @MessageMapping("/sendMessage/{streamId}")  // Receive from /app/sendMessage
-//    @SendTo("/topic/room/{streamId}") // send to subscribers of /topic/room
-//    public ChatMessage message(
-//            @DestinationVariable Long streamId
-//    ){
-//
-//    }
+    @MessageMapping("/sendMessage/{streamId}")  // Receive from /app/sendMessage
+    @SendTo("/topic/stream/{streamId}") // send to subscribers of /topic/stream
+    public ChatResponse message(@DestinationVariable Long streamId,@RequestBody ChatRequest chatRequest) {
+        return messageService.addChat(streamId, chatRequest);
+    }
 }

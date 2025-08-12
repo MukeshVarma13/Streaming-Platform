@@ -1,6 +1,8 @@
 package dev.misfit.StreamingPlatform.controller;
 
 
+import dev.misfit.StreamingPlatform.entities.ChatMessage;
+import dev.misfit.StreamingPlatform.io.ChatResponse;
 import dev.misfit.StreamingPlatform.io.StreamUserResponse;
 import dev.misfit.StreamingPlatform.io.StreamVideosResponse;
 import dev.misfit.StreamingPlatform.services.StreamVideosService;
@@ -57,5 +59,10 @@ public class StreamVideosController {
     @GetMapping("/{streamId}")
     public ResponseEntity<StreamVideosResponse> watchStream(@PathVariable Long streamId) throws Exception {
         return ResponseEntity.ok(streamVideosService.watchStream(streamId));
+    }
+
+    @GetMapping("/{streamId}/messages")
+    public ResponseEntity<List<ChatResponse>> getChatMessages(@PathVariable Long streamId) throws Exception {
+        return ResponseEntity.ok(streamVideosService.getChatMessages(streamId));
     }
 }

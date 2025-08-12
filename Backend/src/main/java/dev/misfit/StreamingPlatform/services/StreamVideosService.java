@@ -1,5 +1,6 @@
 package dev.misfit.StreamingPlatform.services;
 
+import dev.misfit.StreamingPlatform.io.ChatResponse;
 import dev.misfit.StreamingPlatform.io.StreamUserResponse;
 import dev.misfit.StreamingPlatform.io.StreamVideosResponse;
 import org.springframework.stereotype.Service;
@@ -19,4 +20,6 @@ public interface StreamVideosService {
     List<StreamUserResponse> topFollowedStreamers();
 
     StreamVideosResponse watchStream(Long streamId) throws Exception;
+
+    List<ChatResponse> getChatMessages(Long streamId) throws Exception;
 }

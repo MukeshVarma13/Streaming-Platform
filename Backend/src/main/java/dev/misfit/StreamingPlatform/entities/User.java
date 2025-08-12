@@ -31,6 +31,4 @@ public class User {
     @OneToMany(mappedBy = "streamer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Stream> streams;
     private int followers;
-//    @ManyToMany(mappedBy = "streamers")
-//    private List<Followers> followers;
 }

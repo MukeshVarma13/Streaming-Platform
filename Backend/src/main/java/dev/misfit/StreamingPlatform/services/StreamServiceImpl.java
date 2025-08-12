@@ -121,6 +121,7 @@ public class StreamServiceImpl implements StreamService {
         stream.setStreamer(user);
         streamRepository.save(stream);
         user.getStreams().add(stream);
+        userRepository.save(user);
         return convertToResponse(stream);
     }
 
