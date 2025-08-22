@@ -1,13 +1,13 @@
 package dev.misfit.StreamingPlatform.controller;
 
-import dev.misfit.StreamingPlatform.io.StreamUserResponse;
+import dev.misfit.StreamingPlatform.DTO.StreamUserResponse;
 import dev.misfit.StreamingPlatform.services.WatchStreamVideosService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/videos")
-@CrossOrigin
+@RequestMapping("api/v1/videos")
+@CrossOrigin("*")
 public class WatchStreamVideosController {
 
     private final WatchStreamVideosService watchStreamVideos;

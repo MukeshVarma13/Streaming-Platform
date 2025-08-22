@@ -11,7 +11,7 @@ const Navbar = () => {
         <IoIosRadio size={22} />
         <span>Stream</span>
       </div> */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col md:gap-3 gap-2">
         {navbarItems.map((item, index) => {
           return (
             <NavbarItems

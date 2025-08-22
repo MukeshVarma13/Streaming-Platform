@@ -1,4 +1,4 @@
-package dev.misfit.StreamingPlatform.io;
+package dev.misfit.StreamingPlatform.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Set;
 
 @Component
 @NoArgsConstructor
@@ -18,6 +19,6 @@ public class StreamUserResponse {
     private String profilePic;
     private String name;
     private String email;
-    private int followers;
+    private List<Long> followers;
     private List<StreamVideosResponse> streamVideosResponse;
 }

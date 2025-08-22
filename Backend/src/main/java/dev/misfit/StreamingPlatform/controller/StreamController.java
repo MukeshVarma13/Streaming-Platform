@@ -1,8 +1,8 @@
 package dev.misfit.StreamingPlatform.controller;
 
 
-import dev.misfit.StreamingPlatform.io.StreamRequest;
-import dev.misfit.StreamingPlatform.io.StreamResponse;
+import dev.misfit.StreamingPlatform.DTO.StreamRequest;
+import dev.misfit.StreamingPlatform.DTO.StreamResponse;
 import dev.misfit.StreamingPlatform.services.StreamService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

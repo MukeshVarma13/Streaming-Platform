@@ -1,9 +1,9 @@
 package dev.misfit.StreamingPlatform.controller;
 
 
-import dev.misfit.StreamingPlatform.io.LoginRequest;
-import dev.misfit.StreamingPlatform.io.LoginResponse;
-import dev.misfit.StreamingPlatform.io.RegisterRequest;
+import dev.misfit.StreamingPlatform.DTO.LoginRequest;
+import dev.misfit.StreamingPlatform.DTO.LoginResponse;
+import dev.misfit.StreamingPlatform.DTO.RegisterRequest;
 import dev.misfit.StreamingPlatform.services.UserService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;

@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import { useRef } from "react";
 import { useEffect } from "react";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";

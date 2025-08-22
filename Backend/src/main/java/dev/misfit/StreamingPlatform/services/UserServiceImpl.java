@@ -1,9 +1,9 @@
 package dev.misfit.StreamingPlatform.services;
 
 import dev.misfit.StreamingPlatform.entities.User;
-import dev.misfit.StreamingPlatform.io.LoginRequest;
-import dev.misfit.StreamingPlatform.io.LoginResponse;
-import dev.misfit.StreamingPlatform.io.RegisterRequest;
+import dev.misfit.StreamingPlatform.DTO.LoginRequest;
+import dev.misfit.StreamingPlatform.DTO.LoginResponse;
+import dev.misfit.StreamingPlatform.DTO.RegisterRequest;
 import dev.misfit.StreamingPlatform.repositories.UserRepository;
 import dev.misfit.StreamingPlatform.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Value;

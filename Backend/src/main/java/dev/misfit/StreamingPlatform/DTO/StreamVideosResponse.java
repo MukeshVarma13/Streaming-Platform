@@ -1,4 +1,4 @@
-package dev.misfit.StreamingPlatform.io;
+package dev.misfit.StreamingPlatform.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Set;
 
 @Component
 @NoArgsConstructor
@@ -21,7 +23,8 @@ public class StreamVideosResponse {
     private Boolean isLive;
     private Instant startedAt;
     private Instant endedAt;
-    private Integer likes;
+    private List<Long> likes;
     private String thumbnail;
+    private Long views;
     private StreamUserResponse streamUserResponse;
 }

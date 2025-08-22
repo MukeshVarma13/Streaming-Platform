@@ -1,8 +1,8 @@
 package dev.misfit.StreamingPlatform.services;
 
-import dev.misfit.StreamingPlatform.io.LoginRequest;
-import dev.misfit.StreamingPlatform.io.LoginResponse;
-import dev.misfit.StreamingPlatform.io.RegisterRequest;
+import dev.misfit.StreamingPlatform.DTO.LoginRequest;
+import dev.misfit.StreamingPlatform.DTO.LoginResponse;
+import dev.misfit.StreamingPlatform.DTO.RegisterRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 

@@ -1,6 +1,8 @@
 package dev.misfit.StreamingPlatform.filters;
 
+import dev.misfit.StreamingPlatform.utils.JwtUserPrincipal;
 import dev.misfit.StreamingPlatform.utils.JwtUtil;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,8 +37,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
                 if (jwtUtil.validateToken(token, userDetails)) {
+                    Claims claims = jwtUtil.extractClaims(token);
+                    JwtUserPrincipal principal = new JwtUserPrincipal(userDetails, claims);
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                            userDetails,
+                            principal,
                             null,
                             userDetails.getAuthorities());
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

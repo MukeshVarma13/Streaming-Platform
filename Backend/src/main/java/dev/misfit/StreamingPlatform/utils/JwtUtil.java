@@ -34,7 +34,7 @@ public class JwtUtil {
                 .subject(subject)
                 .issuer("MVR")
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60  * 100))
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60  * 300))
                 .and()
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
@@ -54,7 +54,7 @@ public class JwtUtil {
         return  claimsResolver.apply(claims);
     }
 
-    private Claims extractClaims(String token) {
+    public Claims extractClaims(String token) {
         return Jwts
                 .parser()
                 .verifyWith(getSignKey())

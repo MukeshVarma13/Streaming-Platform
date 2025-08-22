@@ -1,16 +1,20 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { IoSend } from "react-icons/io5";
 import { LiaComments } from "react-icons/lia";
 import SockJS from "sockjs-client";
 import { baseURL } from "../config/AxiosHelper";
 import { Stomp } from "@stomp/stompjs";
 import { GetMessages } from "../services/StreamService";
+import { UserContext } from "../context/UserDetailsContext";
 
 const Comments = ({ streamId }) => {
   const [stompClient, setStompClient] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const chatBoxRef = useRef(null);
+  const { userDetail } = useContext(UserContext);
+  
+  const userId = userDetail.id;
 
   useEffect(() => {
     const connectWebSocket = () => {
@@ -31,7 +35,6 @@ const Comments = ({ streamId }) => {
       try {
         const message = await GetMessages(streamId);
         setMessages(message);
-        console.log(message);
       } catch (error) {
         console.error("Error fetching messages:", error);
       }
@@ -51,7 +54,7 @@ const Comments = ({ streamId }) => {
   const sendMessage = async () => {
     if (stompClient && input.trim()) {
       const message = {
-        userId: 5, // dont forget to dynamically add the user id
+        userId: userId, // dont forget to dynamically add the user id
         content: input,
       };
       stompClient.send(
@@ -63,7 +66,7 @@ const Comments = ({ streamId }) => {
     }
   };
 
-  const userColorMap = useRef({}); // persists across renders
+  const userColorMap = useRef({});
 
   function getRandomColor() {
     const letters = "0123456789ABCDEF";
@@ -84,12 +87,12 @@ const Comments = ({ streamId }) => {
 
   return (
     <div className="h-full bg-theme grid grid-cols-1 grid-rows-12">
-      <h1 className="w-full py-2 flex px-4 items-center justify-between text-[17px] border-b-[1px] font-semibol row-span-1">
+      <h1 className="w-full py-2 flex px-4 items-center justify-between text-2xl border-b-[1px] font-semibol row-span-1">
         Stream Chat <LiaComments size={22} />
       </h1>
       <div
         ref={chatBoxRef}
-        className="w-full row-span-10 overflow-y-scroll relative no-scrollbar"
+        className="w-full row-span-10 overflow-y-scroll relative no-scrollbar mt-2"
       >
         <div className="absolute w-full flex flex-col gap-0.5 px-2 pb-2">
           {messages.map((message, index) => (
@@ -99,7 +102,7 @@ const Comments = ({ streamId }) => {
             >
               <div className="w-6 h-6 shrink-0">
                 <img
-                  src={`http://localhost:8080${message.userProfile}`}
+                  src={baseURL + message.userProfile}
                   alt=""
                   className="w-full h-full object-cover rounded-xs"
                 />

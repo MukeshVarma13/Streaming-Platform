@@ -1,17 +1,19 @@
 package dev.misfit.StreamingPlatform.services;
 
+import dev.misfit.StreamingPlatform.DTO.ChatResponse;
+import dev.misfit.StreamingPlatform.DTO.StreamUserResponse;
+import dev.misfit.StreamingPlatform.DTO.StreamVideosResponse;
 import dev.misfit.StreamingPlatform.entities.ChatMessage;
 import dev.misfit.StreamingPlatform.entities.Stream;
 import dev.misfit.StreamingPlatform.entities.User;
-import dev.misfit.StreamingPlatform.io.ChatResponse;
-import dev.misfit.StreamingPlatform.io.StreamUserResponse;
-import dev.misfit.StreamingPlatform.io.StreamVideosResponse;
 import dev.misfit.StreamingPlatform.repositories.StreamRepository;
 import dev.misfit.StreamingPlatform.repositories.UserRepository;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class StreamVideosServiceImpl implements StreamVideosService {
@@ -44,41 +46,35 @@ public class StreamVideosServiceImpl implements StreamVideosService {
     }
 
     @Override
-    public Integer addLikes(Long streamId, boolean like) throws Exception {
-        Optional<Stream> streamOptional = streamRepository.findById(streamId);
-        if (streamOptional.isEmpty()) {
-            throw new Exception("Stream not found. Id invalid");
-        }
-        Stream stream = streamOptional.get();
+    public Integer addLikes(Long streamId, boolean like, Long userId) throws Exception {
+        Stream stream = streamRepository.findById(streamId).orElseThrow(() -> new Exception("Stream not found!"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found from provided token"));
         if (like) {
-            stream.setLikes(stream.getLikes() + 1);
-            streamRepository.save(stream);
-            return stream.getLikes();
+            user.getLikedStream().add(stream);
+        } else {
+            user.getLikedStream().remove(stream);
         }
-        if (!like && stream.getLikes() > 0) {
-            stream.setLikes(stream.getLikes() - 1);
-            streamRepository.save(stream);
-            return stream.getLikes();
-        }
-        return stream.getLikes();
+        userRepository.save(user);
+
+        Stream updatedStream = streamRepository.findById(streamId).get();
+        return updatedStream.getLikedByUser().size();
     }
 
     @Override
-    public void follow(Long streamerId, boolean follow) throws Exception {
+    public void follow(Long streamerId, boolean follow, Long userId) throws Exception {
 
-        Optional<User> userOptional = userRepository.findById(streamerId);
-        if (userOptional.isEmpty()) {
-            throw new Exception("User not found");
-        }
-        User streamer = userOptional.get();
+        User follower = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found!!"));
+        User streamer = userRepository.findById(streamerId).orElseThrow(() -> new UsernameNotFoundException("Streamer not found!!"));
         if (follow) {
-            streamer.setFollowers(streamer.getFollowers() + 1);
-            userRepository.save(streamer);
+            streamer.getFollowers().add(follower);
+            follower.getFollowing().add(streamer);
         }
-        if (!follow && streamer.getFollowers() > 0) {
-            streamer.setFollowers(streamer.getFollowers() - 1);
-            userRepository.save(streamer);
+        if (!follow && !streamer.getFollowers().isEmpty()) {
+            streamer.getFollowers().remove(follower);
+            follower.getFollowing().remove(streamer);
         }
+        userRepository.save(streamer);
+        userRepository.save(follower);
     }
 
     @Override
@@ -86,7 +82,7 @@ public class StreamVideosServiceImpl implements StreamVideosService {
         return userRepository
                 .findAll()
                 .stream()
-                .sorted((a, b) -> b.getFollowers() - a.getFollowers())
+                .sorted((a, b) -> b.getFollowers().size() - a.getFollowers().size())
                 .map(this::convertToStreamUserResponse)
                 .toList();
     }
@@ -111,6 +107,35 @@ public class StreamVideosServiceImpl implements StreamVideosService {
         return stream.getMessages().stream().map(this::convertToChatResponse).toList();
     }
 
+    @Override
+    public StreamUserResponse getLoggedUser(Long userId, String email) throws Exception {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User Not found!!"));
+        if (user.getUserId() != userId) {
+            throw new Exception("Something went wrong");
+        }
+        return convertToStreamUserResponse(user);
+    }
+
+    @Override
+    public List<StreamVideosResponse> searchInDescription(String find) {
+        List<Stream> streams = streamRepository.findByDescriptionContaining(find);
+        return streams.stream().map(this::convertToStreamVideoResponse).toList();
+    }
+
+    @Override
+    public List<StreamVideosResponse> searchInTitle(String find) {
+        List<Stream> streams = streamRepository.findByTitleContaining(find);
+        return streams.stream().map(this::convertToStreamVideoResponse).toList();
+    }
+
+
+//    public List<StreamVideosResponse> search(String find) {
+//        List<Stream> streams = streamRepository.findInDescription(find);
+//        List<Stream> streams = streamRepository.findByDescriptionContaining(find);
+//        List<Stream> streams = streamRepository.findByTitleContaining(find);
+//        return streams.stream().map(this::convertToStreamVideoResponse).toList();
+//    }
+
     private ChatResponse convertToChatResponse(ChatMessage message) {
         return ChatResponse.builder()
                 .id(message.getId())
@@ -131,20 +156,21 @@ public class StreamVideosServiceImpl implements StreamVideosService {
                 .isLive(stream.getIsLive())
                 .startedAt(stream.getStartedAt())
                 .endedAt(stream.getEndedAt())
-                .likes(stream.getLikes())
+                .likes(stream.getLikedByUser().stream().map(likedBy -> likedBy.getUserId()).collect(Collectors.toList()))
                 .streamUserResponse(user)
                 .thumbnail(stream.getThumbnail())
+                .views(stream.getViews())
                 .build();
     }
 
     private StreamUserResponse convertToStreamUserResponse(User user) {
         return StreamUserResponse.builder()
+                .id(user.getUserId())
                 .streamVideosResponse(null)
                 .email(user.getEmail())
-                .id(user.getUserId())
                 .name(user.getName())
                 .profilePic(user.getProfilePic())
-                .followers(user.getFollowers())
+                .followers(user.getFollowers().stream().map(follower -> follower.getUserId()).collect(Collectors.toList()))
                 .build();
     }
 }

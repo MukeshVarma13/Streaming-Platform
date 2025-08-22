@@ -1,7 +1,7 @@
 package dev.misfit.StreamingPlatform.services;
 
-import dev.misfit.StreamingPlatform.io.ChatRequest;
-import dev.misfit.StreamingPlatform.io.ChatResponse;
+import dev.misfit.StreamingPlatform.DTO.ChatRequest;
+import dev.misfit.StreamingPlatform.DTO.ChatResponse;
 import org.springframework.stereotype.Service;
 
 @Service

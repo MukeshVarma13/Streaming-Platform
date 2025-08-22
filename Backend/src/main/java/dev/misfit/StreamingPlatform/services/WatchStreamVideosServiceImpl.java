@@ -1,14 +1,15 @@
 package dev.misfit.StreamingPlatform.services;
 
+import dev.misfit.StreamingPlatform.DTO.StreamUserResponse;
+import dev.misfit.StreamingPlatform.DTO.StreamVideosResponse;
 import dev.misfit.StreamingPlatform.entities.Stream;
 import dev.misfit.StreamingPlatform.entities.User;
-import dev.misfit.StreamingPlatform.io.StreamUserResponse;
-import dev.misfit.StreamingPlatform.io.StreamVideosResponse;
 import dev.misfit.StreamingPlatform.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class WatchStreamVideosServiceImpl implements WatchStreamVideosService {
@@ -22,7 +23,7 @@ public class WatchStreamVideosServiceImpl implements WatchStreamVideosService {
     @Override
     public StreamUserResponse getStreamerDetails(Long streamerId) throws Exception {
         Optional<User> userOptional = userRepository.findById(streamerId);
-        if (userOptional.isEmpty()){
+        if (userOptional.isEmpty()) {
             throw new Exception("User not found");
         }
         User user = userOptional.get();
@@ -38,8 +39,9 @@ public class WatchStreamVideosServiceImpl implements WatchStreamVideosService {
                 .isLive(stream.getIsLive())
                 .startedAt(stream.getStartedAt())
                 .endedAt(stream.getEndedAt())
-                .likes(stream.getLikes())
+                .likes(stream.getLikedByUser().stream().map(likedBy -> likedBy.getUserId()).collect(Collectors.toList()))
                 .thumbnail(stream.getThumbnail())
+                .views(stream.getViews())
                 .build();
     }
 
@@ -51,7 +53,7 @@ public class WatchStreamVideosServiceImpl implements WatchStreamVideosService {
                 .email(user.getEmail())
                 .name(user.getName())
                 .profilePic(user.getProfilePic())
-                .followers(user.getFollowers())
+                .followers(user.getFollowers().stream().map(follower -> follower.getUserId()).collect(Collectors.toList()))
                 .build();
     }
 }

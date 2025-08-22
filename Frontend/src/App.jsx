@@ -29,7 +29,7 @@ const App = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/setting" element={<Settings />} />
-          <Route path="/watchstream/:streamId" element={<WatchStream />} />
+          <Route path="/stream/:streamId" element={<WatchStream />} />
           <Route path="/directory/:name" element={<Trendding />} />
           <Route path="login-register" element={<LoginRegister />} />
           <Route path="/edit-profile" element={<EditProfile />} />

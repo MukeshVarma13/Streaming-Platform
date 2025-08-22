@@ -36,7 +36,7 @@ const WatchStream = () => {
             />
           </div>
           <div className="w-full py-3 px-6 flex flex-col gap-8 h-2/3">
-            <ChannelContainer streamData={streamData} />
+            <ChannelContainer streamData={streamData} streamId={streamId} />
             <Description streamData={streamData} />
           </div>
         </div>

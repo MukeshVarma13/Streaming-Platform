@@ -1,4 +1,4 @@
-package dev.misfit.StreamingPlatform.io;
+package dev.misfit.StreamingPlatform.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,4 +18,5 @@ public class StreamResponse {
     private Boolean isLive;
     private Instant startedAt;
     private String thumbnail;
+    private Long views;
 }

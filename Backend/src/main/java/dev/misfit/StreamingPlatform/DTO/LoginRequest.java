@@ -1,4 +1,4 @@
-package dev.misfit.StreamingPlatform.io;
+package dev.misfit.StreamingPlatform.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class LoginResponse {
-    private String token;
+public class LoginRequest {
+    private String email;
+    private String password;
 }

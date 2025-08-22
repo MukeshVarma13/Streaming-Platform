@@ -4,8 +4,8 @@ import ch.qos.logback.core.model.processor.ProcessorException;
 import dev.misfit.StreamingPlatform.customExceptions.StreamKeyExpiredException;
 import dev.misfit.StreamingPlatform.entities.Stream;
 import dev.misfit.StreamingPlatform.entities.User;
-import dev.misfit.StreamingPlatform.io.StreamRequest;
-import dev.misfit.StreamingPlatform.io.StreamResponse;
+import dev.misfit.StreamingPlatform.DTO.StreamRequest;
+import dev.misfit.StreamingPlatform.DTO.StreamResponse;
 import dev.misfit.StreamingPlatform.repositories.StreamRepository;
 import dev.misfit.StreamingPlatform.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -132,6 +132,7 @@ public class StreamServiceImpl implements StreamService {
                 .url(stream.getUrl())
                 .isLive(stream.getIsLive())
                 .startedAt(stream.getStartedAt())
+                .views(stream.getViews())
                 .build();
     }
 

@@ -1,12 +1,10 @@
 package dev.misfit.StreamingPlatform.services;
 
-import dev.misfit.StreamingPlatform.entities.Stream;
-import dev.misfit.StreamingPlatform.io.StreamRequest;
-import dev.misfit.StreamingPlatform.io.StreamResponse;
+import dev.misfit.StreamingPlatform.DTO.StreamRequest;
+import dev.misfit.StreamingPlatform.DTO.StreamResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.util.Map;
 
 @Service
