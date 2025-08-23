@@ -20,5 +20,7 @@ public class StreamUserResponse {
     private String name;
     private String email;
     private List<Long> followers;
+    private List<Long> following;
+    private List<Long> likedStreams;
     private List<StreamVideosResponse> streamVideosResponse;
 }

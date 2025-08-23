@@ -53,7 +53,9 @@ public class WatchStreamVideosServiceImpl implements WatchStreamVideosService {
                 .email(user.getEmail())
                 .name(user.getName())
                 .profilePic(user.getProfilePic())
+                .likedStreams(user.getLikedStream().stream().map(likedStream -> likedStream.getId()).toList())
                 .followers(user.getFollowers().stream().map(follower -> follower.getUserId()).collect(Collectors.toList()))
+                .following(user.getFollowing().stream().map(following -> following.getUserId()).toList())
                 .build();
     }
 }

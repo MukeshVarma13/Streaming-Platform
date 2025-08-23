@@ -5,9 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -32,7 +30,6 @@ public class User {
     private List<ChatMessage> messages;
     @OneToMany(mappedBy = "streamer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Stream> streams;
-//    private int followers;
     @ManyToMany
     @JoinTable(
             name = "user_followers",
@@ -41,12 +38,7 @@ public class User {
     )
     private List<User> followers = new ArrayList<>();
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_following",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "following_id")
-    )
+    @ManyToMany(mappedBy = "followers")
     private List<User> following = new ArrayList<>();
 
     @ManyToMany
@@ -57,4 +49,6 @@ public class User {
     )
     @JsonManagedReference
     private List<Stream> likedStream = new ArrayList<>();
+    @Version
+    private Long version;
 }

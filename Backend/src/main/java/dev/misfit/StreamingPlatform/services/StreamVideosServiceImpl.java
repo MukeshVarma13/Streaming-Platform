@@ -10,6 +10,7 @@ import dev.misfit.StreamingPlatform.repositories.StreamRepository;
 import dev.misfit.StreamingPlatform.repositories.UserRepository;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -46,21 +47,26 @@ public class StreamVideosServiceImpl implements StreamVideosService {
     }
 
     @Override
+    @Transactional
     public Integer addLikes(Long streamId, boolean like, Long userId) throws Exception {
         Stream stream = streamRepository.findById(streamId).orElseThrow(() -> new Exception("Stream not found!"));
         User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found from provided token"));
         if (like) {
-            user.getLikedStream().add(stream);
+            if (user.getLikedStream().stream().noneMatch(s -> s.getId().equals(stream.getId()))) {
+                user.getLikedStream().add(stream);
+            }
         } else {
-            user.getLikedStream().remove(stream);
+            user.getLikedStream().removeIf(s -> s.getId().equals(stream.getId()));
         }
         userRepository.save(user);
 
         Stream updatedStream = streamRepository.findById(streamId).get();
+        System.out.println(updatedStream.getLikedByUser().size());
         return updatedStream.getLikedByUser().size();
     }
 
     @Override
+    @Transactional
     public void follow(Long streamerId, boolean follow, Long userId) throws Exception {
 
         User follower = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found!!"));
@@ -68,10 +74,9 @@ public class StreamVideosServiceImpl implements StreamVideosService {
         if (follow) {
             streamer.getFollowers().add(follower);
             follower.getFollowing().add(streamer);
-        }
-        if (!follow && !streamer.getFollowers().isEmpty()) {
-            streamer.getFollowers().remove(follower);
-            follower.getFollowing().remove(streamer);
+        } else {
+            streamer.getFollowers().removeIf(u -> u.getUserId().equals(follower.getUserId()));
+            follower.getFollowing().removeIf(u -> u.getUserId().equals(streamer.getUserId()));
         }
         userRepository.save(streamer);
         userRepository.save(follower);
@@ -171,6 +176,7 @@ public class StreamVideosServiceImpl implements StreamVideosService {
                 .name(user.getName())
                 .profilePic(user.getProfilePic())
                 .followers(user.getFollowers().stream().map(follower -> follower.getUserId()).collect(Collectors.toList()))
+                .following(user.getFollowing().stream().map(following -> following.getUserId()).toList())
                 .build();
     }
 }
