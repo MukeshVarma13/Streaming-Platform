@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 
 @Component
 @NoArgsConstructor
@@ -25,5 +26,7 @@ public class StreamVideosResponse {
     private List<Long> likes;
     private String thumbnail;
     private Long views;
+    private List<String> tags;
+    private Set<String> categories;
     private StreamUserResponse streamUserResponse;
 }

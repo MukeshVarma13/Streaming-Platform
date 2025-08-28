@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import SockJS from "sockjs-client";
+import { useEffect, useState } from "react";
 import { baseURL } from "../config/AxiosHelper";
 
 const ViewerCount = ({ streamId }) => {

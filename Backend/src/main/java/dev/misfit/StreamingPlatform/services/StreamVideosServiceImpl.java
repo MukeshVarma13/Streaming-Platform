@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -133,6 +134,23 @@ public class StreamVideosServiceImpl implements StreamVideosService {
         return streams.stream().map(this::convertToStreamVideoResponse).toList();
     }
 
+    @Override
+    public List<StreamUserResponse> getStreamByUserName(String term) {
+        List<User> users = userRepository.findByNameContaining(term);
+        return users.stream().map(this::convertToStreamUserResponse).toList();
+    }
+
+    @Override
+    public List<StreamVideosResponse> findByTags(String term) {
+        List<Stream> streams = streamRepository.findByTagsIn(Collections.singleton(term));
+        return streams.stream().map(this::convertToStreamVideoResponse).toList();
+    }
+
+    @Override
+    public List<StreamVideosResponse> findByCategories(String term) {
+        List<Stream> byCategoriesIn = streamRepository.findByCategoriesIn(Collections.singleton(term));
+        return byCategoriesIn.stream().map(this::convertToStreamVideoResponse).toList();
+    }
 
 //    public List<StreamVideosResponse> search(String find) {
 //        List<Stream> streams = streamRepository.findInDescription(find);
@@ -165,6 +183,8 @@ public class StreamVideosServiceImpl implements StreamVideosService {
                 .streamUserResponse(user)
                 .thumbnail(stream.getThumbnail())
                 .views(stream.getViews())
+                .categories(stream.getCategories())
+                .tags(stream.getTags())
                 .build();
     }
 

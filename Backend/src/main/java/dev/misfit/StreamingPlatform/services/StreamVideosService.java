@@ -25,7 +25,13 @@ public interface StreamVideosService {
 
     StreamUserResponse getLoggedUser(Long userId, String email) throws Exception;
 
-    List<StreamVideosResponse> searchInDescription(String find);
+    List<StreamVideosResponse> searchInDescription(String term);
 
-    List<StreamVideosResponse> searchInTitle(String find);
+    List<StreamVideosResponse> searchInTitle(String term);
+
+    List<StreamUserResponse> getStreamByUserName(String term);
+
+    List<StreamVideosResponse> findByTags(String term);
+
+    List<StreamVideosResponse> findByCategories(String term);
 }

@@ -2,6 +2,8 @@ package dev.misfit.StreamingPlatform.DTO;
 
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -11,6 +13,8 @@ public class StreamRequest {
     private String description;
     @NonNull
     private String streamKey;
-    @org.springframework.lang.NonNull
-    private Long userId;
+//    @org.springframework.lang.NonNull
+//    private Long userId;
+    private List<String> tags;
+    private List<String> categories;
 }

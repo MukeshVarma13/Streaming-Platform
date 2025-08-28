@@ -42,6 +42,8 @@ public class WatchStreamVideosServiceImpl implements WatchStreamVideosService {
                 .likes(stream.getLikedByUser().stream().map(likedBy -> likedBy.getUserId()).collect(Collectors.toList()))
                 .thumbnail(stream.getThumbnail())
                 .views(stream.getViews())
+                .categories(stream.getCategories())
+                .tags(stream.getTags())
                 .build();
     }
 

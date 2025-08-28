@@ -15,6 +15,6 @@ public interface StreamService {
 
     String generateStreamKey();
 
-    StreamResponse startStream(StreamRequest request, MultipartFile thumbnail) throws Exception;
+    StreamResponse startStream(StreamRequest request, MultipartFile thumbnail, Long userId) throws Exception;
 }
 

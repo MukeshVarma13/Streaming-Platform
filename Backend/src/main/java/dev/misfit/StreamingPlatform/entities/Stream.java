@@ -41,6 +41,10 @@ public class Stream {
     private User streamer;
     @OneToMany(mappedBy = "stream", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatMessage> messages;
+    @ElementCollection
+    private List<String> tags;
+    @ElementCollection
+    private Set<String> categories;
     @Version
     private Long version;
 }

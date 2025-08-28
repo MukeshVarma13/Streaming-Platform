@@ -4,8 +4,10 @@ package dev.misfit.StreamingPlatform.controller;
 import dev.misfit.StreamingPlatform.DTO.StreamRequest;
 import dev.misfit.StreamingPlatform.DTO.StreamResponse;
 import dev.misfit.StreamingPlatform.services.StreamService;
+import dev.misfit.StreamingPlatform.utils.JwtUserPrincipal;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -55,9 +57,11 @@ public class StreamController {
     @PostMapping("/stream/start")
     public ResponseEntity<StreamResponse> startStream(
             @RequestPart("details") StreamRequest request,
-            @RequestPart("thumbnail") MultipartFile thumbnail
+            @RequestPart("thumbnail") MultipartFile thumbnail,
+            @AuthenticationPrincipal JwtUserPrincipal user
     ) throws Exception {
-        StreamResponse response = service.startStream(request, thumbnail);
+        Long userId = user.getClaims().get("userId", Long.class);
+        StreamResponse response = service.startStream(request, thumbnail, userId);
         if (response == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }

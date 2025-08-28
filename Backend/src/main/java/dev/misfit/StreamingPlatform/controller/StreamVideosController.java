@@ -97,13 +97,30 @@ public class StreamVideosController {
         }
     }
 
+    // Search stream based on description
     @GetMapping("/search-in-desc")
-    public ResponseEntity<List<StreamVideosResponse>> searchInDesc(@RequestParam(name = "find") String find) {
-        return ResponseEntity.ok(streamVideosService.searchInDescription(find));
+    public ResponseEntity<List<StreamVideosResponse>> searchInDesc(@RequestParam(name = "term", required = true) String term) {
+        return ResponseEntity.ok(streamVideosService.searchInDescription(term));
     }
 
+    // Search stream based on title
     @GetMapping("/search-in-title")
-    public ResponseEntity<List<StreamVideosResponse>> searchInTitle(@RequestParam(name = "find") String find) {
-        return ResponseEntity.ok(streamVideosService.searchInTitle(find));
+    public ResponseEntity<List<StreamVideosResponse>> searchInTitle(@RequestParam(name = "term", required = true) String term) {
+        return ResponseEntity.ok(streamVideosService.searchInTitle(term));
+    }
+
+    @GetMapping("/search-by-user")
+    public ResponseEntity<List<StreamUserResponse>> searchByUserName(@RequestParam(name = "term", required = true) String term) {
+        return ResponseEntity.ok(streamVideosService.getStreamByUserName(term));
+    }
+
+    @GetMapping("/tag")
+    public ResponseEntity<List<StreamVideosResponse>> findByTags(@RequestParam(name = "term", required = true) String term){
+        return ResponseEntity.ok(streamVideosService.findByTags(term));
+    }
+
+    @GetMapping("/category")
+    public ResponseEntity<List<StreamVideosResponse>> findByCategories(@RequestParam(name = "term", required = true) String term) {
+        return ResponseEntity.ok(streamVideosService.findByCategories(term));
     }
 }

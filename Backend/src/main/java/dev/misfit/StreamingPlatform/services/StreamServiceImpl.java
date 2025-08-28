@@ -1,11 +1,11 @@
 package dev.misfit.StreamingPlatform.services;
 
 import ch.qos.logback.core.model.processor.ProcessorException;
+import dev.misfit.StreamingPlatform.DTO.StreamRequest;
+import dev.misfit.StreamingPlatform.DTO.StreamResponse;
 import dev.misfit.StreamingPlatform.customExceptions.StreamKeyExpiredException;
 import dev.misfit.StreamingPlatform.entities.Stream;
 import dev.misfit.StreamingPlatform.entities.User;
-import dev.misfit.StreamingPlatform.DTO.StreamRequest;
-import dev.misfit.StreamingPlatform.DTO.StreamResponse;
 import dev.misfit.StreamingPlatform.repositories.StreamRepository;
 import dev.misfit.StreamingPlatform.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +19,7 @@ import java.nio.file.StandardCopyOption;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 
@@ -98,8 +99,8 @@ public class StreamServiceImpl implements StreamService {
     }
 
     @Override
-    public StreamResponse startStream(StreamRequest request, MultipartFile thumbnail) throws Exception {
-        Optional<User> optionalUser = userRepository.findById(request.getUserId());
+    public StreamResponse startStream(StreamRequest request, MultipartFile thumbnail, Long userId) throws Exception {
+        Optional<User> optionalUser = userRepository.findById(userId);
         if (optionalUser.isEmpty()) {
             throw new Exception("Invalid user");
         }
@@ -111,11 +112,11 @@ public class StreamServiceImpl implements StreamService {
         }
 
         String thumbnailOriginalFilename = thumbnail.getOriginalFilename();
-        String outputFolder = videoPath + "/" + request.getUserId() + "/" + request.getStreamKey();
+        String outputFolder = videoPath + "/" + userId + "/" + request.getStreamKey();
         new File(outputFolder).mkdirs();
         Path path = Path.of(outputFolder, thumbnailOriginalFilename);
         Files.copy(thumbnail.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-        String thumbnailPath = "/thumbnail/" + request.getUserId() + "/" + request.getStreamKey() + "/" + thumbnailOriginalFilename;
+        String thumbnailPath = "/thumbnail/" + userId + "/" + request.getStreamKey() + "/" + thumbnailOriginalFilename;
 
         Stream stream = convertToStream(request, thumbnailPath);
         stream.setStreamer(user);
@@ -145,6 +146,8 @@ public class StreamServiceImpl implements StreamService {
                 .streamKey(request.getStreamKey())
                 .url("/hls/" + request.getStreamKey() + ".m3u8")
                 .thumbnail(thumbnailPath)
+                .tags(request.getTags())
+                .categories(new HashSet<>(request.getCategories()))
                 .build();
     }
 }

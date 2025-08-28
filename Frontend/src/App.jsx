@@ -25,7 +25,7 @@ const App = () => {
           <Route index element={<Home />} />
           <Route path="/following" element={<Following />} />
           <Route path="/search" element={<Search />} />
-          <Route path="/channel" element={<Channel />} />
+          <Route path="/channel/:id" element={<Channel />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/setting" element={<Settings />} />

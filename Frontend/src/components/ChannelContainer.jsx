@@ -11,6 +11,7 @@ import { follow } from "../services/StreamService";
 import { LiaUserFriendsSolid } from "react-icons/lia";
 import { baseURL } from "../config/AxiosHelper";
 import { UserContext } from "../context/UserDetailsContext";
+import { NavLink } from "react-router";
 
 const ChannelContainer = ({ streamData, streamId }) => {
   const [like, setLike] = useState(false);
@@ -18,22 +19,21 @@ const ChannelContainer = ({ streamData, streamId }) => {
   const [following, setFollowing] = useState(false);
   const streamerId = streamData.streamUserResponse.id;
   const [isOpen, setIsOpen] = useState(false);
-   const { userDetail } = useContext(UserContext);
+  const { userDetail } = useContext(UserContext);
   const userId = userDetail.id;
-  
 
   const handleLike = async () => {
     setLike(!like);
     const result = await addLike(streamId, !like);
     setLikeCount(result);
-    console.log(result);
+    // console.log(result);
   };
 
   const handleFollow = async () => {
     const result = await follow(streamerId, !following);
     setFollowing(!following);
     setIsOpen(false);
-    console.log(result);
+    // console.log(result);
   };
 
   const toggleDropdown = () => setIsOpen(!isOpen);
@@ -41,7 +41,7 @@ const ChannelContainer = ({ streamData, streamId }) => {
     setIsOpen(false);
   };
 
-  console.log(streamData);
+  // console.log(streamData);
 
   useEffect(() => {
     setLike(streamData.likes.includes(userId));
@@ -52,7 +52,10 @@ const ChannelContainer = ({ streamData, streamId }) => {
   return (
     <div className="flex justify-between">
       <div className="flex gap-2.5 items-end">
-        <div className="h-20 w-20 rounded-full relative">
+        <NavLink
+          className="h-20 w-20 rounded-full relative"
+          to={`/channel/${streamData.streamUserResponse.id}`}
+        >
           <img
             src={baseURL + streamData.streamUserResponse.profilePic}
             alt=""
@@ -65,20 +68,31 @@ const ChannelContainer = ({ streamData, streamId }) => {
           >
             <p className="bg-red-500 px-1 rounded-sm font-semibold">LIVE</p>
           </div>
-        </div>
+        </NavLink>
         <div>
           <h1 className="text-2xl mb-2">
             {streamData.streamUserResponse.name}
           </h1>
           <div className="flex flex-col justify-center gap-1">
-            <p>{streamData.title}</p>
+            <p className="first-letter:uppercase">{streamData.title}</p>
             <div className="flex gap-2 items-center">
-              <h2 className="text-purple-600">Rust</h2>
-              <span className="bg-[#29292E] rounded-2xl px-2">Deutsch</span>
-              <span className="bg-[#29292E] rounded-2xl px-2 ">English</span>
-              <span className="bg-[#29292E] rounded-2xl px-2 ">
-                DropEnabled
-              </span>
+              {streamData.categories.map((category, index) => {
+                return (
+                  <h2 className="text-grade capitalize" key={index}>
+                    {category}
+                  </h2>
+                );
+              })}
+              {streamData.tags.map((tag, index) => {
+                return (
+                  <span
+                    className="bg-[#29292E] rounded-2xl px-2 capitalize text-center"
+                    key={index}
+                  >
+                    {tag}
+                  </span>
+                );
+              })}
             </div>
           </div>
         </div>
