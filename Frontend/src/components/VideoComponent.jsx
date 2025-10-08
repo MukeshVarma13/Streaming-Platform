@@ -3,19 +3,21 @@ import { useEffect } from "react";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
 
-const VideoComponent = ({ videoURL, thumbnail }) => {
+const VideoComponent = ({ videoURL, thumbnail, control = true }) => {
   const videoRef = useRef();
   const playerRef = useRef();
 
   useEffect(() => {
     playerRef.current = videojs(videoRef.current, {
-      controls: true,
-      autoplay: false,
+      controls: control,
+      autoplay: control ? true : "muted",
       preload: "auto",
       responsive: true,
       fluid: true,
       playbackRates: [0.5, 1, 1.5, 2],
       poster: thumbnail,
+      bigPlayButton: false,
+      loop: true,
       sources: [
         {
           src: videoURL,

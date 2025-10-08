@@ -1,4 +1,3 @@
-import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, Navigation } from "swiper/modules"; // Include other modules if needed
 
@@ -58,11 +57,7 @@ const MainCarosel = () => {
             <div className="absolute bottom-10 left-16 flex flex-col items-start justify-center gap-2">
               <h1 className="text-5xl font-bold">{item.title}</h1>
               <div className="flex gap-4 items-center">
-                <img
-                  src={item.image}
-                  alt=""
-                  className="h-8 w-8 rounded-full"
-                />
+                <img src={item.image} alt="" className="h-8 w-8 rounded-full" />
                 <h1 className="text-xl">{item.streamer}</h1>
               </div>
               <div className="py-2 px-6 mt-1 mix-grade rounded-4xl flex gap-1 items-center">

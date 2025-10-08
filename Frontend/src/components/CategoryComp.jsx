@@ -1,4 +1,4 @@
-import React from "react";
+
 import { categories } from "../services/Categories";
 import { NavLink } from "react-router";
 

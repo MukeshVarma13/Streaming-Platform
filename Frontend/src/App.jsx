@@ -14,6 +14,12 @@ import Trendding from "./pages/Trending";
 import WatchStream from "./pages/WatchStream";
 import Navbar from "./components/Navbar";
 import Header from "./components/Header";
+import ChannelHome from "./components/ChannelHome";
+import ChannelAbout from "./components/ChannelAbout";
+import ChannelVideos from "./components/ChannelVideos";
+import Category from "./pages/Category";
+import CategoryChannels from "./components/CategoryChannels";
+import CategoryVideos from "./components/CategoryVideos";
 
 const App = () => {
   return (
@@ -25,12 +31,20 @@ const App = () => {
           <Route index element={<Home />} />
           <Route path="/following" element={<Following />} />
           <Route path="/search" element={<Search />} />
-          <Route path="/channel/:id" element={<Channel />} />
+          <Route path="/channel/:id" element={<Channel />}>
+            <Route index element={<ChannelHome />} />
+            <Route path="about" element={<ChannelAbout />} />
+            <Route path="videos" element={<ChannelVideos />} />
+          </Route>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/setting" element={<Settings />} />
           <Route path="/stream/:streamId" element={<WatchStream />} />
           <Route path="/directory/:name" element={<Trendding />} />
+          <Route path="/directory/category/:category" element={<Category />}>
+            <Route index element={<CategoryChannels />} />
+            <Route path="all" element={<CategoryVideos />} />
+          </Route>
           <Route path="login-register" element={<LoginRegister />} />
           <Route path="/edit-profile" element={<EditProfile />} />
           <Route path="/library" element={<Library />} />

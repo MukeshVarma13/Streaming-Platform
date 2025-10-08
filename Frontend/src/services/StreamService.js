@@ -8,19 +8,23 @@ import { axiosLive } from "../config/AxiosHelper";
 //   "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjIsInN1YiI6Im1pc2ZpdEBnbWFpbC5jb20iLCJpc3MiOiJNVlIiLCJpYXQiOjE3NTU4ODY3MjMsImV4cCI6MTc1Njk2NjcyM30.WjsDkF7zxdfLQC8DJaL7dKo7THlgUbtBnGe2qrp88go";
 
 const token =
-  "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjYsInN1YiI6Im11a2VzaDFAZ21haWwuY29tIiwiaXNzIjoiTVZSIiwiaWF0IjoxNzU1OTcyNjYyLCJleHAiOjE3NTcwNTI2NjJ9.bL5CF2oaOzqbsnh6utrZFgy_tib0jFxgyquaLsU1h0w";
+  "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjYsInN1YiI6Im11a2VzaDFAZ21haWwuY29tIiwiaXNzIjoiTVZSIiwiaWF0IjoxNzU3MzQ3NjMyLCJleHAiOjE3NTg0Mjc2MzJ9.5D6S2AM1Ocd4_qKe_It7z50k3nDp2spVqfOOuItkQ6A";
 
 localStorage.setItem("token", token); // remove and implement login
 
 // Get videos that are live
-export const GetLiveStreamVideo = async (liveURL) => {
-  const response = await axiosLive.get(liveURL);
+export const GetLiveStreamVideo = async () => {
+  const response = await axios.get(`/api/v1/videos/live`, {
+    headers: {
+      Authorization: token,
+    },
+  });
   return response.data;
 };
 
 // Get all the videos that are present in the db
-export const GetStreamedVideo = async (url) => {
-  const response = await axios.get(url, {
+export const GetStreamedVideo = async () => {
+  const response = await axios.get(`/api/v1/videos`, {
     headers: {
       Authorization: token,
     },
@@ -135,5 +139,25 @@ export const getstreamerDetails = async (streamerId) => {
       },
     }
   );
+  return response.data;
+};
+
+// Get streams by category
+export const getCategories = async (term) => {
+  const response = await axios.get(`api/v1/videos/category?term=${term}`, {
+    headers: {
+      Authorization: token,
+    },
+  });
+  return response.data;
+};
+
+// Get streams by Tag
+export const getByTags = async (term) => {
+  const response = await axios.get(`api/v1/videos/tag?term=${term}`, {
+    headers: {
+      Authorization: token,
+    },
+  });
   return response.data;
 };

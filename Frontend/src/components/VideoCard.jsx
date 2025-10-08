@@ -1,25 +1,66 @@
-import React from "react";
-import { BsThreeDotsVertical } from "react-icons/bs";
-import { GoDotFill } from "react-icons/go";
+import { NavLink, useNavigate } from "react-router";
+import { baseURL } from "../config/AxiosHelper";
 
-const VideoCard = ({ index }) => {
+const VideoCard = ({ stream }) => {
+  // console.log(stream);
+  const navigate = useNavigate();
   return (
-    <div className="flex flex-col overflow-hidden">
-      <img
-        src="https://i.pinimg.com/736x/58/00/90/5800909258eeb8b128ec80a42c786af8.jpg"
-        alt=""
-        className="bg-green-200 aspect-video"
-      />
-      <div className="flex justify-between items-start py-3 px-2">
-        <div className="flex gap-2 items-end">
+    <div className="flex flex-col gap-2">
+      <NavLink to={`/stream/${stream.id}`} className="aspect-video rounded">
+        <img
+          src={baseURL + stream.thumbnail}
+          alt=""
+          className="aspect-video w-full h-full bg-theme rounded"
+        />
+      </NavLink>
+      <div className="flex gap-2 capitalize items-center">
+        <NavLink
+          to={`/channel/${stream.streamUserResponse.id}`}
+          className="w-12 h-12 rounded-full"
+        >
           <img
-            src="	https://i.pinimg.com/736x/40/17/50/40175058274de769287ee71582e99fde.jpg"
+            src={baseURL + stream.streamUserResponse.profilePic}
             alt=""
-            className="h-12 w-12 rounded-full border "
+            className="w-full h-full rounded-full object-cover bg-theme"
           />
-          <div>
-            <h1 className="text-xs opacity-75">Misfit Playz</h1>
-            <h1 className="font-semibold">Rush BGMI Conquror gameplay</h1>
+        </NavLink>
+        <div>
+          <div
+            className="cursor-pointer"
+            onClick={() => {
+              navigate(`/stream/${stream.id}`);
+            }}
+          >
+            <h2>{stream.streamUserResponse.name}</h2>
+            <p className="text-sm">{stream.title}</p>
+          </div>
+          <div className="flex gap-2 items-center flex-wrap text-sm">
+            {stream.categories.map((category, index) => {
+              return (
+                <h2
+                  className="text-grade capitalize cursor-pointer"
+                  key={index}
+                  onClick={() => {
+                    navigate(`/directory/category/${category}`);
+                  }}
+                >
+                  {category}
+                </h2>
+              );
+            })}
+            {stream.tags.map((tag, index) => {
+              return (
+                <span
+                  className="bg-[#29292E] rounded-2xl px-2 capitalize text-center cursor-pointer"
+                  key={index}
+                  onClick={() => {
+                    navigate(`/directory/tag/${tag}`);
+                  }}
+                >
+                  {tag}
+                </span>
+              );
+            })}
           </div>
         </div>
       </div>
