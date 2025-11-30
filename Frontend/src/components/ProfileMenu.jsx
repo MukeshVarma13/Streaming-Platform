@@ -1,13 +1,14 @@
 import { useState, useRef, useEffect, use, useContext } from "react";
-import { NavLink } from "react-router";
+import { Link, NavLink } from "react-router";
 import { baseURL } from "../config/AxiosHelper";
 import { UserContext } from "../context/UserDetailsContext";
 
 export default function ProfileMenu() {
   const [open, setOpen] = useState(false);
   const { userDetail } = useContext(UserContext);
-  const dropdownRef = useRef(); 
+  const dropdownRef = useRef();
   const toggleDropdown = () => setOpen(!open);
+  const [authMenuOpen, setAuthMenuOpen] = useState(false);
 
   useEffect(() => {
     const handler = (e) => {
@@ -19,12 +20,56 @@ export default function ProfileMenu() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  const handleLogout = () => {
+    // console.log("Logout clicked");
+    localStorage.removeItem("token");
+    window.location.href = "/";
+  };
+
+  if (!userDetail) {
+    return (
+      <div>
+        <button
+          onClick={() => setAuthMenuOpen(!authMenuOpen)}
+          className="px-4 py-2 bg-theme text-white rounded-lg hover:bg-indigo-700 transition"
+        >
+          Account
+        </button>
+        {authMenuOpen && !userDetail && (
+          <div className="absolute right-0 mt-2 w-64 rounded-md shadow-lg bg-white border border-gray-200 z-10 bg-theme p-4 transform animate-slideDown">
+            <h3 className="text-lg font-semibold mb-2 text-white">
+              Welcome 👋
+            </h3>
+
+            <Link
+              to="/auth"
+              className="block w-full text-center py-2 mb-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition text-black"
+            >
+              Login
+            </Link>
+
+            <Link
+              to="/auth/sign-up"
+              className="block w-full text-center py-2 rounded-lg body-theme text-white hover:bg-indigo-700 transition"
+            >
+              Sign Up
+            </Link>
+
+            <p className="mt-3 text-xs text-center text-gray-500">
+              Secure login • OTP supported
+            </p>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     userDetail && (
       <div className="relative inline-block" ref={dropdownRef}>
         <button
           onClick={toggleDropdown}
-          className="flex items-center gap-1 px-4 py-1 rounded-3xl"
+          className="py-1 flex items-center gap-2 px-3 hover-theme rounded-lg"
         >
           <img
             src={baseURL + userDetail.profilePic}
@@ -58,20 +103,13 @@ export default function ProfileMenu() {
                 <NavLink to="/profile">
                   <MenuItem label="Profile" />
                 </NavLink>
-                <NavLink to="/edit-profile">
-                  <MenuItem label="Edit Profile" />
-                </NavLink>
-                <NavLink to="/dashboard">
-                  <MenuItem label="Dashboard" />
-                </NavLink>
                 <NavLink to="/setting">
                   <MenuItem label="Settings" />
                 </NavLink>
               </div>
 
               {/* Section 2: Preferences */}
-              <div className="mb-3 border-t border-gray-200 pt-3">
-                <MenuItem label="Quick search" shortcut="⌘K" />
+              {/* <div className="mb-3 border-t border-gray-200 pt-3">
                 <div className="flex justify-between items-center px-2 py-1 text-sm text-gray-600 cursor-default">
                   Theme
                   <select className="text-sm border border-gray-300 rounded px-1 py-0.5">
@@ -80,12 +118,14 @@ export default function ProfileMenu() {
                     <option>Light</option>
                   </select>
                 </div>
-              </div>
+              </div> */}
 
               {/* Section 3: Help & Feedback */}
               <div className="border-t border-gray-200 pt-3">
-                <MenuItem label="Help & Feedback" />
-                <MenuItem label="Log Out" />
+                {/* <MenuItem label="Help & Feedback" /> */}
+                <div onClick={handleLogout}>
+                  <MenuItem label="Log Out" />
+                </div>
               </div>
             </div>
           </div>

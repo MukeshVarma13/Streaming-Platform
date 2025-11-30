@@ -1,24 +1,19 @@
 package dev.misfit.StreamingPlatform.services;
 
-import dev.misfit.StreamingPlatform.entities.User;
 import dev.misfit.StreamingPlatform.DTO.LoginRequest;
 import dev.misfit.StreamingPlatform.DTO.LoginResponse;
 import dev.misfit.StreamingPlatform.DTO.RegisterRequest;
+import dev.misfit.StreamingPlatform.customExceptions.UnauthorizedUserException;
+import dev.misfit.StreamingPlatform.customExceptions.UserNotFoundException;
+import dev.misfit.StreamingPlatform.entities.User;
 import dev.misfit.StreamingPlatform.repositories.UserRepository;
 import dev.misfit.StreamingPlatform.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -42,44 +37,42 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean addUser(RegisterRequest registerRequest, MultipartFile file) throws IOException {
+    public boolean addUser(RegisterRequest registerRequest) {
         registerRequest.setPassword(bCryptPasswordEncoder
                 .encode(registerRequest.getPassword()));
-        User user = convertT0User(registerRequest);
+        User user = convertToUser(registerRequest);
 
-        Path uploadDir = Path.of(profilePicPath);
-        Files.createDirectories(uploadDir);
+//        Path uploadDir = Path.of(profilePicPath);
+//        Files.createDirectories(uploadDir);
 
-        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-        Path filePath = uploadDir.resolve(fileName);
+//        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+//        Path filePath = uploadDir.resolve(fileName);
+//
+//        Files.copy(file.getInputStream(), filePath);
 
-        Files.copy(file.getInputStream(), filePath);
-
-        user.setProfilePic("/profile-pic/" + fileName);
+//        user.setProfilePic("/profile-pic/" + fileName);
         userRepository.save(user);
         return true;
+
     }
 
-    private User convertT0User(RegisterRequest request) {
+    private User convertToUser(RegisterRequest request) {
         return User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
                 .password(request.getPassword())
+                .verified(true)
                 .build();
     }
 
 
     @Override
-    public LoginResponse login(LoginRequest loginRequest) throws Exception {
+    public LoginResponse login(LoginRequest loginRequest) {
 
-        Optional<User> userOptional = userRepository.findByEmail(loginRequest.getEmail());
-        if (userOptional.isEmpty()) {
-            throw new Exception("Invalid Email");
-        }
+        User user = userRepository.findByEmail(loginRequest.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        User user = userOptional.get();
-
-        Path profilePath = Path.of(profilePicPath, user.getProfilePic());
+//        Path profilePath = Path.of(profilePicPath, user.getProfilePic());
 
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(
@@ -92,6 +85,6 @@ public class UserServiceImpl implements UserService {
                     .token(jwtUtil.generateToken(loginRequest.getEmail(), user.getUserId()))
                     .build();
         }
-        throw new UsernameNotFoundException("Invalid user request!");
+        throw new UnauthorizedUserException("User unauthorized");
     }
 }

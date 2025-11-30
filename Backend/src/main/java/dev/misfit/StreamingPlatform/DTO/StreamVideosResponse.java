@@ -1,5 +1,6 @@
 package dev.misfit.StreamingPlatform.DTO;
 
+import dev.misfit.StreamingPlatform.utils.StreamStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,13 +21,13 @@ public class StreamVideosResponse {
     private String title;
     private String description;
     private String url;
-    private Boolean isLive;
+    private StreamStatus status;
     private Instant startedAt;
     private Instant endedAt;
-    private List<Long> likes;
+    private Set<Long> likes;
     private String thumbnail;
-    private Long views;
+    private Set<Long> watchers;
     private List<String> tags;
-    private Set<String> categories;
-    private StreamUserResponse streamUserResponse;
+    private String categories;
+    private StreamerResponse streamUserResponse;
 }

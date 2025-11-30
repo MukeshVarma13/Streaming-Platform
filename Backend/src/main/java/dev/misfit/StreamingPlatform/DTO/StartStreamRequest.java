@@ -8,13 +8,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class StreamRequest {
+public class StartStreamRequest {
     private String title;
     private String description;
     @NonNull
     private String streamKey;
-//    @org.springframework.lang.NonNull
-//    private Long userId;
     private List<String> tags;
-    private List<String> categories;
+    private String categories;
 }

@@ -13,7 +13,7 @@ const Description = ({ streamData }) => {
       <h1 className="text-xl mb-1.5">
         About {streamData.streamUserResponse.name}
       </h1>
-      <div className="w-full bg-theme rounded-sm flex justify-between px-4 gap-20">
+      <div className="w-full bg-theme rounded-sm flex justify-between px-4 flex-wrap">
         <div className="flex flex-col gap-3 py-3">
           <h3 className="text-[17px]">
             <span className="font-semibold">{followers}</span>{" "}

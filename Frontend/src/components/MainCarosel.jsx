@@ -30,7 +30,7 @@ const MainCarosel = () => {
         "https://i.pinimg.com/736x/31/62/c8/3162c8f364ecc47ee9b171fdf63ba7ea.jpg",
       streamer: "Rando Gaming",
       streamerProfile: "",
-      title: "Random ass title",
+      title: "Random title",
     },
   ];
 

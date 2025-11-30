@@ -40,15 +40,19 @@ body {
   /* background: #353456; */
   background: rgba(19, 18, 18, 0.98);
 }
-/* .mix-grade2 { */
-/* background: linear-gradient(to bottom,#F20A92, #0c1122); */
-/* background: linear-gradient(to bottom, #f20a92, #0e0e10); */
-/* } */
-
-/* .active{
-  color: #F20A92;
-} */
 
 .text-grade {
   color: #b994ff;
+}
+
+.nav-item {
+  @apply flex px-4 py-2 gap-4 items-center hover:bg-gray-300 hover:text-indigo-500 border-r-4 border-transparent hover:border-indigo-500;
+}
+
+.category-item {
+  @apply flex items-center gap-2 px-2 py-1 rounded hover:bg-indigo-500 hover:text-white text-gray-300;
+}
+
+.mobile-nav-item {
+  @apply flex flex-col items-center text-gray-300 hover:text-indigo-400;
 }

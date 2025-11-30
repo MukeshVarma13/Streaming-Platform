@@ -1,7 +1,7 @@
 package dev.misfit.StreamingPlatform.services;
 
-import dev.misfit.StreamingPlatform.DTO.StreamRequest;
-import dev.misfit.StreamingPlatform.DTO.StreamResponse;
+import dev.misfit.StreamingPlatform.DTO.StartStreamRequest;
+import dev.misfit.StreamingPlatform.DTO.StartStreamResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -9,12 +9,16 @@ import java.util.Map;
 
 @Service
 public interface StreamService {
-    boolean authenticatePublish(Map<String, String> param);
-
-    void streamDone(String streamKey) throws Exception;
-
     String generateStreamKey();
 
-    StreamResponse startStream(StreamRequest request, MultipartFile thumbnail, Long userId) throws Exception;
-}
+    StartStreamResponse startStream(StartStreamRequest request, MultipartFile thumbnail, Long userId);
 
+    boolean authenticatePublish(Map<String, String> param);
+
+    boolean streamStatus(Long streamId);
+
+    StartStreamResponse makeStreamLive(String streamKey, Long userId);
+
+    void streamDone(String streamKey);
+
+}

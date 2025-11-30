@@ -40,7 +40,7 @@ public class VideoController {
     }
 
     @GetMapping("/folder/{streamerId}")
-    public List<String> listVideos(@PathVariable String streamerId) throws IOException {
+    public List<String> listVideos(@PathVariable String streamerId) {
         File folder = new File(videoUrl, streamerId);
         if (!folder.exists() || !folder.isDirectory()) return Collections.emptyList();
 

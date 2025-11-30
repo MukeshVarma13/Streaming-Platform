@@ -1,10 +1,11 @@
 package dev.misfit.StreamingPlatform.services;
 
-import dev.misfit.StreamingPlatform.DTO.StreamUserResponse;
+import dev.misfit.StreamingPlatform.DTO.StreamerResponse;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
 public interface WatchStreamVideosService {
 
-    StreamUserResponse getStreamerDetails(Long streamerId) throws Exception;
+    StreamerResponse getStreamerDetails(Long streamerId, Pageable pageable);
 }

@@ -2,35 +2,40 @@ import MainCarosel from "../components/MainCarosel";
 import VideoList from "../components/VideoList";
 import TopStreamers from "../components/TopStreamers";
 import CategoryComp from "../components/CategoryComp";
-import { useEffect, useState } from "react";
-import {
-  GetLiveStreamVideo,
-  GetStreamedVideo,
-} from "../services/StreamService";
+import { getAllStreams, getLiveStreams } from "../api/streams.api";
+import useInfiniteScrollContext from "../context/useInfiniteScrollContext";
 
 const Home = () => {
-  const [streamVideos, setStreamVideos] = useState();
-  const [liveStreams, setLiveStreams] = useState();
+  const {
+    data: recordedStreams,
+    hasNextPage: recordedHasNextPage,
+    fetchNextPage: recordedFetchNextPage,
+    isFetchingNextPage: recordedIsFetchingNextPage,
+    isLoading: recordedLoading,
+    isError: recordedError,
+    isFetching: recordedIsFetching,
+    ref: recordedRef,
+    inView: recordedInView,
+  } = useInfiniteScrollContext(getAllStreams, null, "recorded-streams", false);
 
-  const getStreamedVideos = async () => {
-    const streamedVideos = await GetStreamedVideo();
-    setStreamVideos(streamedVideos);
-    // console.log(streamedVideos);
-  };
+  const {
+    data: liveStreams,
+    isLoading: liveLoading,
+    hasNextPage: liveHasNextPage,
+    fetchNextPage: liveFetchNextPage,
+    isFetchingNextPage: liveIsFetchingNextPage,
+    isError: liveError,
+    isFetching: liveIsFetching,
+    ref: liveRef,
+    inView: liveInView,
+  } = useInfiniteScrollContext(getLiveStreams, null, "live-streams", true);
 
-  const getLiveStreamVideo = async () => {
-    const liveStreamsVideos = await GetLiveStreamVideo();
-    setLiveStreams(liveStreamsVideos);
-    // console.log(liveStreamsVideos);
-  };
+  if (recordedLoading || liveLoading) {
+    return <p className="text-white p-5">Loading...</p>;
+  }
 
-  useEffect(() => {
-    getStreamedVideos();
-    getLiveStreamVideo();
-  }, []);
-
-  if (!streamVideos || !liveStreams) {
-    return <p>Loading...</p>;
+  if (recordedError || liveError) {
+    return <p className="text-red-500 p-5">Failed to load streams.</p>;
   }
 
   return (
@@ -44,13 +49,23 @@ const Home = () => {
         <TopStreamers title={"Top Streamers"} />
       </div>
       <div className="w-full">
-        <VideoList title={"Recommended for you"} streams={streamVideos} />
+        <VideoList
+          title={"Recommended for you"}
+          streams={recordedStreams}
+          isFetchingNextPage={recordedIsFetchingNextPage}
+          observerRef={recordedRef}
+        />
       </div>
       <div className="w-full py-3">
         <CategoryComp />
       </div>
       <div className="w-full">
-        <VideoList title={"Live Streaming"} streams={liveStreams} />
+        <VideoList
+          title={"Live Streaming"}
+          streams={liveStreams}
+          isFetchingNextPage={liveIsFetchingNextPage}
+          observerRef={liveRef}
+        />
       </div>
     </div>
   );

@@ -3,6 +3,8 @@ import Esports from "../assets/esports.svg";
 import Creative from "../assets/creative.svg";
 import IRL from "../assets/irl.svg";
 import Music from "../assets/music.svg";
+import Coding from "../assets/coding.png";
+import Podcast from "../assets/podcast.png";
 
 export const categories = [
   {
@@ -18,16 +20,16 @@ export const categories = [
   {
     image: Music,
     link: "/music",
-    name: "Music & DJs",
+    name: "Music",
   },
   {
-    image: Creative,
-    link: "/creative",
-    name: "Creative",
+    image: Coding,
+    link: "/coding",
+    name: "Coding",
   },
   {
-    image: Esports,
-    link: "/esports",
-    name: "Esports",
+    image: Podcast,
+    link: "/podcast",
+    name: "Podcasts",
   },
 ];

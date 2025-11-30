@@ -1,130 +1,68 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
 import { IoSend } from "react-icons/io5";
 import { LiaComments } from "react-icons/lia";
-import SockJS from "sockjs-client";
-import { baseURL } from "../config/AxiosHelper";
-import { Stomp } from "@stomp/stompjs";
-import { GetMessages } from "../services/StreamService";
-import { UserContext } from "../context/UserDetailsContext";
+import { useStreamChat } from "../context/useStreamChat";
+import { baseURL } from "../api/axios";
 
 const Comments = ({ streamId }) => {
-  const [stompClient, setStompClient] = useState(null);
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
-  const chatBoxRef = useRef(null);
-  const { userDetail } = useContext(UserContext);
-  
-  const userId = userDetail.id;
-
-  useEffect(() => {
-    const connectWebSocket = () => {
-      const client = Stomp.over(() => new SockJS(`${baseURL}/chat`));
-      client.connect({}, () => {
-        setStompClient(client);
-        client.subscribe(`/topic/stream/${streamId}`, (message) => {
-          const newMessage = JSON.parse(message.body);
-          setMessages((prev) => [...prev, newMessage]);
-        });
-      });
-    };
-    connectWebSocket();
-  }, [streamId]);
-
-  useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-        const message = await GetMessages(streamId);
-        setMessages(message);
-      } catch (error) {
-        console.error("Error fetching messages:", error);
-      }
-    };
-    fetchMessages();
-  }, []);
-
-  useEffect(() => {
-    if (chatBoxRef.current) {
-      chatBoxRef.current.scroll({
-        top: chatBoxRef.current.scrollHeight,
-        behavior: "smooth",
-      });
-    }
-  }, [messages]);
-
-  const sendMessage = async () => {
-    if (stompClient && input.trim()) {
-      const message = {
-        userId: userId, // dont forget to dynamically add the user id
-        content: input,
-      };
-      stompClient.send(
-        `/app/sendMessage/${streamId}`,
-        {},
-        JSON.stringify(message)
-      );
-      setInput("");
-    }
-  };
-
-  const userColorMap = useRef({});
-
-  function getRandomColor() {
-    const letters = "0123456789ABCDEF";
-    let color = "#";
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  }
-
-  useEffect(() => {
-    messages.forEach((message) => {
-      if (!userColorMap.current[message.userName]) {
-        userColorMap.current[message.userName] = getRandomColor();
-      }
-    });
-  }, [messages]); // runs when messages change
+  const {
+    messages,
+    input,
+    setInput,
+    sendMessage,
+    chatBoxRef,
+    userColorMap,
+    isLoadingMessages,
+  } = useStreamChat(streamId);
 
   return (
-    <div className="h-full bg-theme grid grid-cols-1 grid-rows-12">
-      <h1 className="w-full py-2 flex px-4 items-center justify-between text-2xl border-b-[1px] font-semibol row-span-1">
+    <div className="h-full bg-theme flex flex-col justify-between">
+      <h1 className="w-full py-1 md:py-2 flex px-4 items-center justify-between md:text-2xl border-b-[1px] border-white/20 font-semibol">
         Stream Chat <LiaComments size={22} />
       </h1>
       <div
         ref={chatBoxRef}
-        className="w-full row-span-10 overflow-y-scroll relative no-scrollbar mt-2"
+        className="w-full row-span-10 overflow-y-scroll relative no-scrollbar mt-2 h-full"
       >
         <div className="absolute w-full flex flex-col gap-0.5 px-2 pb-2">
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className="w-full flex items-start gap-0.5 rounded-sm mb-1.5"
-            >
-              <div className="w-6 h-6 shrink-0">
-                <img
-                  src={baseURL + message.userProfile}
-                  alt=""
-                  className="w-full h-full object-cover rounded-xs"
-                />
-              </div>
-              <div className="flex gap-2">
-                <p
-                  className="shrink-0 break-all font-semibold"
-                  style={{ color: userColorMap.current[message.userName] }}
-                >
-                  {message.userName}:
-                </p>
-                <p className="break-all">{message.content}</p>
-              </div>
-            </div>
-          ))}
+          {isLoadingMessages
+            ? [...Array(8)].map((_, i) => (
+                <div key={i} className="w-full mb-3 animate-pulse">
+                  <div className="flex gap-2 items-center">
+                    <div className="w-6 h-6 rounded-full bg-white/10"></div>
+                    <div className="w-24 h-5 bg-white/10 rounded"></div>
+                  </div>
+                  <div className="ml-8 mr-2 bg-white/10 py-1 px-2 rounded-r-xl rounded-b-xl h-8 w-48"></div>
+                </div>
+              ))
+            : messages.map((message, index) => (
+                <div key={index} className="w-full mb-1.5">
+                  <div className="flex gap-1">
+                    <div className="w-6 h-6 shrink-0 rounded-full">
+                      <img
+                        src={baseURL + message.userProfile}
+                        alt=""
+                        className="w-full h-full object-cover rounded-full bg-white/5"
+                      />
+                    </div>
+                    <p
+                      className="font-semibold shrink-0"
+                      style={{ color: userColorMap.current[message.userName] }}
+                    >
+                      {message.userName}
+                    </p>
+                  </div>
+                  <p className="ml-8 mr-2 w-fit bg-white/10 py-1 px-2 rounded-r-xl rounded-b-xl">
+                    {message.content}
+                  </p>
+                </div>
+              ))}
         </div>
       </div>
-      <div className="w-full row-span-1 bg-gray-800 border-4 border-purple-500 rounded-md pr-3 flex justify-between items-center gap-6">
+      <div className="flex gap-2 p-2 w-full border-t border-white/20">
         <input
           type="text"
-          className="h-full outline-none font-semibold pl-3 w-full"
-          placeholder="Send a message"
+          className="bg-theme p-3 rounded-xl text-sm outline-none border border-white/10 focus:border-indigo-500/70 transition w-full"
+          placeholder="Send a message..."
           value={input}
           onChange={(e) => {
             setInput(e.target.value);
@@ -135,7 +73,10 @@ const Comments = ({ streamId }) => {
             }
           }}
         />
-        <button onClick={sendMessage}>
+        <button
+          className="px-2 md:px-4 body-theme rounded-xl hover:bg-indigo-700 transition active:scale-95"
+          onClick={sendMessage}
+        >
           <IoSend size={22} />
         </button>
       </div>

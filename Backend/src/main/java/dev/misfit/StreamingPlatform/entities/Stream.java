@@ -1,6 +1,7 @@
 package dev.misfit.StreamingPlatform.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import dev.misfit.StreamingPlatform.utils.StreamStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,33 +19,60 @@ import java.util.Set;
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Stream {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
+
     private String title;
+
+    @Column(length = 500)
     private String description;
-    @NonNull
+
     @Column(unique = true, nullable = false)
     private String streamKey;
+
     private String url;
-    private Boolean isLive;
+
+    @Enumerated(EnumType.STRING)
+    private StreamStatus status;
+
     private Instant startedAt;
     private Instant endedAt;
-    @ManyToMany(mappedBy = "likedStream")
-    @JsonBackReference
-    private List<User> likedByUser = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "likedStreams", fetch = FetchType.LAZY)
+    @JsonBackReference(value = "stream_likes")
+    @ToString.Exclude
+    @Builder.Default
+    private Set<User> likes = new HashSet<>();
+
     private String thumbnail;
-//    @Column(nullable = false)
-    private Long views = 0L;
-    @ManyToOne
+
+    @ManyToMany(mappedBy = "watchedStreams", fetch = FetchType.LAZY)
+    @JsonBackReference(value = "stream_watchers")
+    @ToString.Exclude
+    @Builder.Default
+    private Set<User> watchers = new HashSet<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "streamer_id", nullable = false)
+    @JsonBackReference(value = "streamer_streams")
+    @ToString.Exclude
     private User streamer;
-    @OneToMany(mappedBy = "stream", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ChatMessage> messages;
+
+    @OneToMany(mappedBy = "stream", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @Builder.Default
+    private List<ChatMessage> messages = new ArrayList<>();
+
     @ElementCollection
-    private List<String> tags;
-    @ElementCollection
-    private Set<String> categories;
+    @ToString.Exclude
+    @Builder.Default
+    private List<String> tags = new ArrayList<>();
+
+    private String categories;
+
     @Version
     private Long version;
 }

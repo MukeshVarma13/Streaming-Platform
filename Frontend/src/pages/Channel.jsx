@@ -1,32 +1,46 @@
-import { useEffect, useState } from "react";
 import { NavLink, Outlet, useParams } from "react-router";
-import { getstreamerDetails } from "../services/StreamService";
 import VideoComponent from "../components/VideoComponent";
-import { baseURL } from "../config/AxiosHelper";
+import { streamURL } from "../api/axios";
 import ChannelUserDetail from "../components/ChannelUserDetail";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { getstreamerDetails } from "../api/streams.api";
 
 const Channel = () => {
   const { id } = useParams();
-  const [streamerDetails, setStreamerDetails] = useState();
-  const [latestStream, setLatestStream] = useState();
 
-  const getDetails = async (id) => {
-    const details = await getstreamerDetails(id);
-    setStreamerDetails(details);
-    setLatestStream(details.streamVideosResponse.toReversed()[1]); // Change this later
-  };
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+  } = useInfiniteQuery({
+    queryKey: ["channel-streamer-details", id],
+    queryFn: ({ pageParam = 0 }) => getstreamerDetails(id, pageParam),
+    getNextPageParam: (lastPage) =>
+      lastPage.streamVideosResponse.last
+        ? undefined
+        : lastPage.streamVideosResponse.number + 1,
+    enabled: !!id,
+    refetchInterval: 5000,
+    refetchOnWindowFocus: false,
+  });
 
-  useEffect(() => {
-    getDetails(id);
-  }, [id]);
+  const streamerDetails = data?.pages?.[0];
+  const latestStream = data?.pages?.[0].streamVideosResponse?.content?.[0];
+  // console.log(data);
 
-  if (!streamerDetails || !latestStream) {
+  if (isLoading) {
     return <p>Loading....</p>;
   }
   return (
-    <div className="w-full relative px-">
-      {latestStream.isLive ? (
-        <VideoComponent videoURL={baseURL + latestStream.url} control={false} /> // change this later too
+    <div className="w-full relative pr-4">
+      {latestStream?.status == "LIVE" ? (
+        <VideoComponent
+          videoURL={streamURL + latestStream.url}
+          control={false}
+        />
       ) : (
         <img
           src="/profile.jpeg"
@@ -35,7 +49,7 @@ const Channel = () => {
         />
       )}
 
-      <div className="absolute top-1/2 right-0 left-0 flex flex-col bg-[#0e0e10] gap-5 pr-4 mr-24">
+      <div className="absolute top-1/2 right-0 left-0 flex flex-col bg-[#0e0e10] gap-5 pr-4 md:mr-24">
         <ChannelUserDetail
           streamerDetails={streamerDetails}
           latestStreamVideo={latestStream}
@@ -53,7 +67,14 @@ const Channel = () => {
             </NavLink>
           </ul>
           {/* <hr className="w-full pb-3 opacity-60"/> */}
-          <Outlet context={{ streamerDetails }} />
+          <Outlet
+            context={{
+              data,
+              isFetchingNextPage,
+              fetchNextPage,
+              hasNextPage,
+            }}
+          />
         </div>
       </div>
     </div>

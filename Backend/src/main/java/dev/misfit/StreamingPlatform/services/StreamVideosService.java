@@ -1,37 +1,39 @@
 package dev.misfit.StreamingPlatform.services;
 
 import dev.misfit.StreamingPlatform.DTO.ChatResponse;
-import dev.misfit.StreamingPlatform.DTO.StreamUserResponse;
 import dev.misfit.StreamingPlatform.DTO.StreamVideosResponse;
+import dev.misfit.StreamingPlatform.DTO.StreamerResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public interface StreamVideosService {
-    List<StreamVideosResponse> getActiveStreams();
+    Page<StreamVideosResponse> getActiveStreams(Pageable pageable);
 
-    List<StreamVideosResponse> getStreamedVideos();
+    Page<StreamVideosResponse> getStreamedVideos(Pageable pageable);
 
-    Integer addLikes(Long streamId, boolean like, Long userId) throws Exception;
+    Integer addLikes(Long streamId, boolean like, Long userId);
 
-    void follow(Long streamerId, boolean follow, Long userId) throws Exception;
+    void follow(Long streamerId, boolean follow, Long userId);
 
-    List<StreamUserResponse> topFollowedStreamers();
+    Page<StreamerResponse> topFollowedStreamers(Pageable pageable);
 
-    StreamVideosResponse watchStream(Long streamId) throws Exception;
+    StreamVideosResponse watchStream(Long streamId);
 
-    List<ChatResponse> getChatMessages(Long streamId) throws Exception;
+    List<ChatResponse> getChatMessages(Long streamId);
 
-    StreamUserResponse getLoggedUser(Long userId, String email) throws Exception;
+    StreamerResponse getLoggedUser(Long userId, String email);
 
-    List<StreamVideosResponse> searchInDescription(String term);
+    Page<StreamVideosResponse> searchInDescription(String term, Pageable pageable);
 
-    List<StreamVideosResponse> searchInTitle(String term);
+    Page<StreamVideosResponse> searchInTitle(String term, Pageable pageable);
 
-    List<StreamUserResponse> getStreamByUserName(String term);
+    Page<StreamerResponse> getStreamByUserName(String term, Pageable pageable);
 
-    List<StreamVideosResponse> findByTags(String term);
+    Page<StreamVideosResponse> findByTags(String term, Pageable pageable);
 
-    List<StreamVideosResponse> findByCategories(String term);
+    Page<StreamVideosResponse> findByCategories(String term, Pageable pageable);
 }

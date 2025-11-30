@@ -1,20 +1,24 @@
 package dev.misfit.StreamingPlatform.services;
 
 import dev.misfit.StreamingPlatform.DTO.ChatResponse;
-import dev.misfit.StreamingPlatform.DTO.StreamUserResponse;
 import dev.misfit.StreamingPlatform.DTO.StreamVideosResponse;
+import dev.misfit.StreamingPlatform.DTO.StreamerResponse;
+import dev.misfit.StreamingPlatform.customExceptions.StreamNotFoundException;
+import dev.misfit.StreamingPlatform.customExceptions.UserNotFoundException;
 import dev.misfit.StreamingPlatform.entities.ChatMessage;
 import dev.misfit.StreamingPlatform.entities.Stream;
 import dev.misfit.StreamingPlatform.entities.User;
 import dev.misfit.StreamingPlatform.repositories.StreamRepository;
 import dev.misfit.StreamingPlatform.repositories.UserRepository;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import dev.misfit.StreamingPlatform.utils.StreamStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,127 +33,137 @@ public class StreamVideosServiceImpl implements StreamVideosService {
     }
 
     @Override
-    public List<StreamVideosResponse> getActiveStreams() {
-        return streamRepository
-                .findAll()
+    public Page<StreamVideosResponse> getActiveStreams(Pageable pageable) {
+        Page<Stream> pagedStreams = streamRepository.findAll(pageable);
+        List<StreamVideosResponse> liveStreams = pagedStreams
                 .stream()
-                .filter(Stream::getIsLive)
+                .filter(stream -> stream.getStatus().equals(StreamStatus.LIVE))
                 .map(this::convertToStreamVideoResponse)
                 .toList();
+        return new PageImpl<>(liveStreams, pageable, pagedStreams.getTotalElements());
     }
 
     @Override
-    public List<StreamVideosResponse> getStreamedVideos() {
-        return streamRepository
-                .findAll()
+    public Page<StreamVideosResponse> getStreamedVideos(Pageable pageable) {
+        Page<Stream> pagedStreams = streamRepository.findAll(pageable);
+
+        List<StreamVideosResponse> streams = pagedStreams
                 .stream()
+                .filter(stream -> stream.getStatus().equals(StreamStatus.ENDED))
                 .map(this::convertToStreamVideoResponse)
                 .toList();
+        return new PageImpl<>(streams, pageable, pagedStreams.getTotalElements());
     }
 
     @Override
     @Transactional
-    public Integer addLikes(Long streamId, boolean like, Long userId) throws Exception {
-        Stream stream = streamRepository.findById(streamId).orElseThrow(() -> new Exception("Stream not found!"));
-        User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found from provided token"));
+    public Integer addLikes(Long streamId, boolean like, Long userId) {
+        Stream stream = streamRepository.findById(streamId)
+                .orElseThrow(() -> new StreamNotFoundException("Stream not found!"));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found from the token"));
+
         if (like) {
-            if (user.getLikedStream().stream().noneMatch(s -> s.getId().equals(stream.getId()))) {
-                user.getLikedStream().add(stream);
-            }
+            user.getLikedStreams().add(stream);
         } else {
-            user.getLikedStream().removeIf(s -> s.getId().equals(stream.getId()));
+            user.getLikedStreams().removeIf(s -> s.getId().equals(stream.getId()));
         }
         userRepository.save(user);
 
-        Stream updatedStream = streamRepository.findById(streamId).get();
-        System.out.println(updatedStream.getLikedByUser().size());
-        return updatedStream.getLikedByUser().size();
+        return streamRepository.findById(streamId)
+                .map(s -> s.getLikes().size())
+                .orElse(0);
     }
 
     @Override
     @Transactional
-    public void follow(Long streamerId, boolean follow, Long userId) throws Exception {
+    public void follow(Long streamerId, boolean follow, Long userId) {
 
-        User follower = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found!!"));
-        User streamer = userRepository.findById(streamerId).orElseThrow(() -> new UsernameNotFoundException("Streamer not found!!"));
+        User follower = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        User streamer = userRepository.findById(streamerId)
+                .orElseThrow(() -> new UserNotFoundException("Streamer not found"));
+
         if (follow) {
             streamer.getFollowers().add(follower);
             follower.getFollowing().add(streamer);
         } else {
-            streamer.getFollowers().removeIf(u -> u.getUserId().equals(follower.getUserId()));
-            follower.getFollowing().removeIf(u -> u.getUserId().equals(streamer.getUserId()));
+            streamer.getFollowers().remove(follower);
+            follower.getFollowing().remove(streamer);
         }
+
         userRepository.save(streamer);
         userRepository.save(follower);
     }
 
     @Override
-    public List<StreamUserResponse> topFollowedStreamers() {
-        return userRepository
-                .findAll()
+    public Page<StreamerResponse> topFollowedStreamers(Pageable pageable) {
+        Page<User> pagedUsers = userRepository.findAll(pageable);
+        List<StreamerResponse> sortedUsers = pagedUsers
+                .getContent()
                 .stream()
                 .sorted((a, b) -> b.getFollowers().size() - a.getFollowers().size())
                 .map(this::convertToStreamUserResponse)
                 .toList();
+        return new PageImpl<>(sortedUsers, pageable, pagedUsers.getTotalElements());
     }
 
     @Override
-    public StreamVideosResponse watchStream(Long streamId) throws Exception {
-        Optional<Stream> streamOptional = streamRepository.findById(streamId);
-        if (streamOptional.isEmpty()) {
-            throw new Exception("Stream not found");
-        }
-        Stream stream = streamOptional.get();
+    public StreamVideosResponse watchStream(Long streamId) {
+        Stream stream = streamRepository.findById(streamId)
+                .orElseThrow(() -> new StreamNotFoundException("Stream not found"));
         return convertToStreamVideoResponse(stream);
     }
 
     @Override
-    public List<ChatResponse> getChatMessages(Long streamId) throws Exception {
-        Optional<Stream> optionalStream = streamRepository.findById(streamId);
-        if (optionalStream.isEmpty()) {
-            throw new Exception("Stream not found!!");
-        }
-        Stream stream = optionalStream.get();
-        return stream.getMessages().stream().map(this::convertToChatResponse).toList();
+    public List<ChatResponse> getChatMessages(Long streamId) {
+        Stream stream = streamRepository.findById(streamId)
+                .orElseThrow(() -> new StreamNotFoundException("Stream not found"));
+        return stream.getMessages().stream()
+                .map(this::convertToChatResponse)
+                .toList();
     }
 
     @Override
-    public StreamUserResponse getLoggedUser(Long userId, String email) throws Exception {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User Not found!!"));
-        if (user.getUserId() != userId) {
-            throw new Exception("Something went wrong");
+    public StreamerResponse getLoggedUser(Long userId, String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User Not found"));
+        if (!user.getUserId().equals(userId)) {
+            throw new UserNotFoundException("User mismatch");
         }
         return convertToStreamUserResponse(user);
     }
 
     @Override
-    public List<StreamVideosResponse> searchInDescription(String find) {
-        List<Stream> streams = streamRepository.findByDescriptionContaining(find);
-        return streams.stream().map(this::convertToStreamVideoResponse).toList();
+    public Page<StreamVideosResponse> searchInDescription(String find, Pageable pageable) {
+        Page<Stream> streams = streamRepository.findByDescriptionContaining(find, pageable);
+        return streams.map(this::convertToStreamVideoResponse);
     }
 
     @Override
-    public List<StreamVideosResponse> searchInTitle(String find) {
-        List<Stream> streams = streamRepository.findByTitleContaining(find);
-        return streams.stream().map(this::convertToStreamVideoResponse).toList();
+    public Page<StreamVideosResponse> searchInTitle(String find, Pageable pageable) {
+        Page<Stream> streams = streamRepository.findByTitleContaining(find, pageable);
+        return streams.map(this::convertToStreamVideoResponse);
     }
 
     @Override
-    public List<StreamUserResponse> getStreamByUserName(String term) {
-        List<User> users = userRepository.findByNameContaining(term);
-        return users.stream().map(this::convertToStreamUserResponse).toList();
+    public Page<StreamerResponse> getStreamByUserName(String term, Pageable pageable) {
+        Page<User> users = userRepository.findByNameContaining(term, pageable);
+        return users.map(this::convertToStreamUserResponse);
     }
 
     @Override
-    public List<StreamVideosResponse> findByTags(String term) {
-        List<Stream> streams = streamRepository.findByTagsIn(Collections.singleton(term));
-        return streams.stream().map(this::convertToStreamVideoResponse).toList();
+    public Page<StreamVideosResponse> findByTags(String term, Pageable pageable) {
+        Page<Stream> streamByTags = streamRepository.findByTagsIn(Collections.singleton(term), pageable);
+        return streamByTags.map(this::convertToStreamVideoResponse);
     }
 
     @Override
-    public List<StreamVideosResponse> findByCategories(String term) {
-        List<Stream> byCategoriesIn = streamRepository.findByCategoriesIn(Collections.singleton(term));
-        return byCategoriesIn.stream().map(this::convertToStreamVideoResponse).toList();
+    public Page<StreamVideosResponse> findByCategories(String term, Pageable pageable) {
+        Page<Stream> pagedCategory = streamRepository.findByCategoriesIn(Collections.singleton(term), pageable);
+        return pagedCategory.map(this::convertToStreamVideoResponse);
     }
 
 //    public List<StreamVideosResponse> search(String find) {
@@ -170,33 +184,33 @@ public class StreamVideosServiceImpl implements StreamVideosService {
 
 
     private StreamVideosResponse convertToStreamVideoResponse(Stream stream) {
-        StreamUserResponse user = convertToStreamUserResponse(stream.getStreamer());
+        StreamerResponse user = convertToStreamUserResponse(stream.getStreamer());
         return StreamVideosResponse.builder()
                 .id(stream.getId())
                 .title(stream.getTitle())
                 .description(stream.getDescription())
                 .url(stream.getUrl())
-                .isLive(stream.getIsLive())
+                .status(stream.getStatus())
                 .startedAt(stream.getStartedAt())
                 .endedAt(stream.getEndedAt())
-                .likes(stream.getLikedByUser().stream().map(likedBy -> likedBy.getUserId()).collect(Collectors.toList()))
+                .likes(stream.getLikes().stream().map(likedBy -> likedBy.getUserId()).collect(Collectors.toSet()))
+                .watchers(stream.getWatchers().stream().map(viewers -> viewers.getUserId()).collect(Collectors.toSet()))
                 .streamUserResponse(user)
                 .thumbnail(stream.getThumbnail())
-                .views(stream.getViews())
                 .categories(stream.getCategories())
                 .tags(stream.getTags())
                 .build();
     }
 
-    private StreamUserResponse convertToStreamUserResponse(User user) {
-        return StreamUserResponse.builder()
+    private StreamerResponse convertToStreamUserResponse(User user) {
+        return StreamerResponse.builder()
                 .id(user.getUserId())
                 .streamVideosResponse(null)
                 .email(user.getEmail())
                 .name(user.getName())
                 .profilePic(user.getProfilePic())
-                .followers(user.getFollowers().stream().map(follower -> follower.getUserId()).collect(Collectors.toList()))
-                .following(user.getFollowing().stream().map(following -> following.getUserId()).toList())
+                .followers(user.getFollowers().stream().map(follower -> follower.getUserId()).collect(Collectors.toSet()))
+                .following(user.getFollowing().stream().map(following -> following.getUserId()).collect(Collectors.toSet()))
                 .build();
     }
 }

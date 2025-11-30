@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Set;
 
 @Component
@@ -14,13 +14,13 @@ import java.util.Set;
 @AllArgsConstructor
 @Data
 @Builder
-public class StreamUserResponse {
+public class StreamerResponse {
     private Long id;
     private String profilePic;
     private String name;
     private String email;
-    private List<Long> followers;
-    private List<Long> following;
-    private List<Long> likedStreams;
-    private List<StreamVideosResponse> streamVideosResponse;
+    private Set<Long> followers;
+    private Set<Long> following;
+    private Set<Long> likedStreams;
+    private Page<StreamVideosResponse> streamVideosResponse;
 }

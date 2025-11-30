@@ -1,0 +1,66 @@
+
+/* 1. Set the Primary Accent Color (Twitch Purple/Pink: #9146FF) */
+/* This changes the color of all icons, text, and active controls */
+.vjs-twitch-style.video-js {
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    display: flex;
+}
+
+/* 2. Control Bar Background */
+/* Make the control bar dark and semi-transparent */
+.vjs-twitch-style .vjs-control-bar {
+    background: none;
+    /* transition: opacity 0.3s, background-color 0.3s; */
+}
+
+/* 3. Progress Bar / Scrubber (The most important part) */
+
+/* The Play Progress (the filled portion) */
+.vjs-twitch-style .vjs-play-progress {
+  background: #9146FF;
+}
+
+/* The Handle/Thumb on the progress bar */
+.vjs-twitch-style .vjs-play-progress:before {
+    /* Hide the default Video.js thumb if you want a cleaner look */
+    content: none !important; 
+}
+
+/* Make the overall progress control thinner/more subtle like Twitch */
+.vjs-twitch-style .vjs-progress-control {
+    /* height: 0.3em; */
+}
+
+/* 4. Volume and Mute Button */
+.vjs-twitch-style .vjs-volume-level,
+.vjs-twitch-style .vjs-volume-bar:before {
+    background-color: #9146FF;
+}
+
+/* 5. Live Indicator (Crucial for a streaming look) */
+/* Note: You must ensure your player is set up for live streaming for this to appear */
+.vjs-twitch-style .vjs-live-display {
+    background-color: #e91916; /* Bright red dot for Live */
+    border-radius: 0.25em;
+    padding: 0 0.5em;
+    font-size: 0.8em;
+    line-height: 1.5;
+    margin-left: 1em;
+}
+
+/* 6. Big Play Button (You set bigPlayButton: false, but in case you change your mind) */
+.vjs-twitch-style .vjs-big-play-button {
+    background-color: rgba(145, 70, 255, 0.9); /* Opaque accent color */
+    border: none;
+    border-radius: 50%;
+    width: 2em;
+    height: 2em;
+    line-height: 2em;
+    font-size: 3em;
+}
+
+/* This is a simple guide. You may need to inspect the elements in your browser's developer tools 
+to find specific selectors for hover states, settings menus, and other components to fully match 
+the Twitch design. */

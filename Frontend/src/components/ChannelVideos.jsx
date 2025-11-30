@@ -1,16 +1,33 @@
 import { useNavigate, useOutletContext } from "react-router";
 import { baseURL } from "../config/AxiosHelper";
+import { useEffect } from "react";
+import { useInView } from "react-intersection-observer";
 
 const ChannelVideos = () => {
-  const { streamerDetails } = useOutletContext();
+  const { data, isFetchingNextPage, fetchNextPage, hasNextPage } =
+    useOutletContext();
   const navigate = useNavigate();
+  const { ref, inView } = useInView();
   // console.log(streamerDetails);
+
+  const allVideos =
+    data?.pages.flatMap((page) => page.streamVideosResponse.content) ?? [];
+
+  useEffect(() => {
+    if (inView && hasNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage]);
+
+  if (!allVideos.length) {
+    return <div className="text-gray-400 p-5">No recent streams found.</div>;
+  }
 
   return (
     <div className="w-full">
       <div className="w-full h-full">
-        <div className="grid grid-cols-4 gap-4 ">
-          {streamerDetails.streamVideosResponse.map((videos, index) => {
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {allVideos?.map((videos, index) => {
             return (
               <div key={index}>
                 <div
@@ -36,19 +53,14 @@ const ChannelVideos = () => {
                   </p>
                   {/* <span className="text-xs">{videos.likes.length} Likes</span> */}
                   <div className="flex gap-2 items-center flex-wrap text-sm">
-                    {videos.categories.map((category, index) => {
-                      return (
-                        <h2
-                          className="text-grade capitalize cursor-pointer"
-                          key={index}
-                          onClick={() => {
-                            navigate(`/directory/category/${category}`);
-                          }}
-                        >
-                          {category}
-                        </h2>
-                      );
-                    })}
+                    <h2
+                      className="text-grade capitalize cursor-pointer"
+                      onClick={() => {
+                        navigate(`/directory/${videos.categories}`);
+                      }}
+                    >
+                      {videos.categories}
+                    </h2>
                     {videos.tags.map((tag, index) => {
                       return (
                         <span
@@ -68,6 +80,7 @@ const ChannelVideos = () => {
             );
           })}
         </div>
+        <div ref={ref} className="h-10">{isFetchingNextPage && "Loading"}</div>
       </div>
     </div>
   );

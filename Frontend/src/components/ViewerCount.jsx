@@ -8,7 +8,7 @@ const ViewerCount = ({ streamId }) => {
     const socket = new WebSocket(`${baseURL}/viewers?streamId=${streamId}`);
 
     socket.onopen = () => {
-      console.log("Connected to viewers counter for stream " + streamId);
+      // console.log("Connected to viewers counter for stream " + streamId);
     };
 
     socket.onmessage = (e) => {
@@ -16,7 +16,7 @@ const ViewerCount = ({ streamId }) => {
     };
 
     socket.onclose = () => {
-      console.log("Disconneted from viewer counter for stream " + streamId);
+      // console.log("Disconneted from viewer counter for stream " + streamId);
     };
 
     return () => {

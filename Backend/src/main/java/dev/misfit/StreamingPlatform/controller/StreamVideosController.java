@@ -2,10 +2,12 @@ package dev.misfit.StreamingPlatform.controller;
 
 
 import dev.misfit.StreamingPlatform.DTO.ChatResponse;
-import dev.misfit.StreamingPlatform.DTO.StreamUserResponse;
 import dev.misfit.StreamingPlatform.DTO.StreamVideosResponse;
+import dev.misfit.StreamingPlatform.DTO.StreamerResponse;
 import dev.misfit.StreamingPlatform.services.StreamVideosService;
 import dev.misfit.StreamingPlatform.utils.JwtUserPrincipal;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,14 +28,14 @@ public class StreamVideosController {
 
     //  List all live-streaming videos
     @GetMapping("/live")
-    public ResponseEntity<List<StreamVideosResponse>> getLiveStreams() {
-        return ResponseEntity.ok(streamVideosService.getActiveStreams());
+    public ResponseEntity<?> getLiveStreams(@PageableDefault(size = 15) Pageable pageable) {
+        return ResponseEntity.ok(streamVideosService.getActiveStreams(pageable));
     }
 
     //  List all the videos that were live-streamed
     @GetMapping
-    public ResponseEntity<List<StreamVideosResponse>> getStreamedVideos() {
-        return ResponseEntity.ok(streamVideosService.getStreamedVideos());
+    public ResponseEntity<?> getStreamedVideos(@PageableDefault(size = 15) Pageable pageable) {
+        return ResponseEntity.ok(streamVideosService.getStreamedVideos(pageable));
     }
 
     //  To add likes to videos
@@ -44,11 +46,7 @@ public class StreamVideosController {
             @AuthenticationPrincipal JwtUserPrincipal user
     ) {
         Long userId = user.getClaims().get("userId", Long.class);
-        try {
-            return ResponseEntity.ok(streamVideosService.addLikes(streamId, like, userId));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        return ResponseEntity.ok(streamVideosService.addLikes(streamId, like, userId));
     }
 
     //  Follow or Unfollow the streamer
@@ -59,18 +57,14 @@ public class StreamVideosController {
             @AuthenticationPrincipal JwtUserPrincipal user
     ) {
         Long userId = user.getClaims().get("userId", Long.class);
-        try {
-            streamVideosService.follow(streamerId, follow, userId);
-            return ResponseEntity.ok("success");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User or Streamer not found");
-        }
+        streamVideosService.follow(streamerId, follow, userId);
+        return ResponseEntity.ok("success");
     }
 
     //  Top streamers based on Followers
     @GetMapping("/top-streamers")
-    public ResponseEntity<List<StreamUserResponse>> topFollowedStreamers() {
-        return ResponseEntity.ok(streamVideosService.topFollowedStreamers());
+    public ResponseEntity<?> topFollowedStreamers(@PageableDefault(size = 15) Pageable pageable) {
+        return ResponseEntity.ok(streamVideosService.topFollowedStreamers(pageable));
     }
 
     //   To watch the stream video
@@ -87,7 +81,7 @@ public class StreamVideosController {
 
     // To get the user details from JWT Token
     @GetMapping("/me")
-    public ResponseEntity<StreamUserResponse> getProfile(@AuthenticationPrincipal JwtUserPrincipal user) {
+    public ResponseEntity<StreamerResponse> getProfile(@AuthenticationPrincipal JwtUserPrincipal user) {
         Long userId = user.getClaims().get("userId", Long.class);
         String email = user.getUsername();
         try {
@@ -99,28 +93,43 @@ public class StreamVideosController {
 
     // Search stream based on description
     @GetMapping("/search-in-desc")
-    public ResponseEntity<List<StreamVideosResponse>> searchInDesc(@RequestParam(name = "term", required = true) String term) {
-        return ResponseEntity.ok(streamVideosService.searchInDescription(term));
+    public ResponseEntity<?> searchInDesc(
+            @RequestParam(name = "term", required = true) String term,
+            @PageableDefault(size = 15) Pageable pageable
+    ) {
+        return ResponseEntity.ok(streamVideosService.searchInDescription(term, pageable));
     }
 
     // Search stream based on title
     @GetMapping("/search-in-title")
-    public ResponseEntity<List<StreamVideosResponse>> searchInTitle(@RequestParam(name = "term", required = true) String term) {
-        return ResponseEntity.ok(streamVideosService.searchInTitle(term));
+    public ResponseEntity<?> searchInTitle(
+            @RequestParam(name = "term", required = true) String term,
+            @PageableDefault(size = 15) Pageable pageable
+    ) {
+        return ResponseEntity.ok(streamVideosService.searchInTitle(term, pageable));
     }
 
     @GetMapping("/search-by-user")
-    public ResponseEntity<List<StreamUserResponse>> searchByUserName(@RequestParam(name = "term", required = true) String term) {
-        return ResponseEntity.ok(streamVideosService.getStreamByUserName(term));
+    public ResponseEntity<?> searchByUserName(
+            @RequestParam(name = "term", required = true) String term,
+            @PageableDefault(size = 15) Pageable pageable
+    ) {
+        return ResponseEntity.ok(streamVideosService.getStreamByUserName(term, pageable));
     }
 
     @GetMapping("/tag")
-    public ResponseEntity<List<StreamVideosResponse>> findByTags(@RequestParam(name = "term", required = true) String term){
-        return ResponseEntity.ok(streamVideosService.findByTags(term));
+    public ResponseEntity<?> findByTags(
+            @RequestParam(name = "term", required = true) String term,
+            @PageableDefault(size = 15) Pageable pageable
+    ) {
+        return ResponseEntity.ok(streamVideosService.findByTags(term, pageable));
     }
 
     @GetMapping("/category")
-    public ResponseEntity<List<StreamVideosResponse>> findByCategories(@RequestParam(name = "term", required = true) String term) {
-        return ResponseEntity.ok(streamVideosService.findByCategories(term));
+    public ResponseEntity<?> findByCategories(
+            @RequestParam(name = "term", required = true) String term,
+            @PageableDefault(size = 15) Pageable pageable
+    ) {
+        return ResponseEntity.ok(streamVideosService.findByCategories(term, pageable));
     }
 }

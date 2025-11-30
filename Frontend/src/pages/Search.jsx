@@ -1,51 +1,55 @@
-import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import {
   searchByUserName,
   searchVideoInDesc,
   searchVideoInTitle,
-} from "../services/StreamService";
+} from "../api/streams.api";
 import SearchVideosContainer from "../components/SearchVideosContainer";
-import { MdOutlineArrowOutward } from "react-icons/md";
 import { GoArrowUpLeft } from "react-icons/go";
-import ChannelContainer from "../components/ChannelContainer";
 import SearchChannels from "../components/SearchChannels";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 const Search = () => {
   const [searchParam] = useSearchParams();
   const term = searchParam.get("term");
-  const [descVideos, setDescVideos] = useState();
-  const [titleVideo, setTitleVideo] = useState();
-  const [userChannel, setUserChannel] = useState();
 
-  const searchInDesc = async (term) => {
-    const video = await searchVideoInDesc(term);
-    // console.log("Description: ");
-    // console.log(video);
-    setDescVideos(video);
-  };
+  const {
+    data: descVideos,
+    isLoading: descLoading,
+    isError: descError,
+  } = useQuery({
+    queryKey: ["description-search", term],
+    queryFn: () => searchVideoInDesc(term).then((res) => res.data),
+    enabled: !!term,
+  });
 
-  const searchInTitle = async (term) => {
-    const video = await searchVideoInTitle(term);
-    // console.log("Title: ");
-    // console.log(video);
-    setTitleVideo(video);
-  };
+  const {
+    data: titleVideo,
+    isLoading: titleLoading,
+    isError: titleError,
+  } = useQuery({
+    queryKey: ["title-search", term],
+    queryFn: () => searchVideoInTitle(term).then((res) => res.data),
+    enabled: !!term,
+  });
 
-  const searchUserChannel = async (term) => {
-    const channel = await searchByUserName(term);
-    // console.log("Channels: ");
-    setUserChannel(channel);
-  };
+  const {
+    data: channelUser,
+    isLoading: channelLoading,
+    isError: channelError,
+  } = useQuery({
+    queryKey: ["channel-search", term],
+    queryFn: () => searchByUserName(term).then((res) => res.data),
+    enabled: !!term,
+  });
 
-  useEffect(() => {
-    searchInDesc(term);
-    searchInTitle(term);
-    searchUserChannel(term);
-  }, [term]);
+  if (descLoading || titleLoading || channelLoading) {
+    return <p className="text-white p-5">Loading...</p>;
+  }
 
-  if (!descVideos || !titleVideo) {
-    return <p>Loading...</p>;
+  if (descError || titleError || channelError) {
+    return <p className="text-red-500 p-5">Failed to load streams.</p>;
   }
 
   return (
@@ -62,11 +66,11 @@ const Search = () => {
         </h2>
         <hr className="opacity-40 mt-1" />
       </div>
-      {userChannel.length > 0 && (
+      {channelUser.length > 0 && (
         <div className="w-full mt-2">
           <p className="my-1 text-2xl text-grade">Channels</p>
           <div className="flex flex-col">
-            {userChannel.map((channel, index) => (
+            {channelUser.map((channel, index) => (
               <SearchChannels channel={channel} key={index} />
             ))}
           </div>

@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { useEffect } from "react";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
+import "./twitch-player.css";
 
 const VideoComponent = ({ videoURL, thumbnail, control = true }) => {
   const videoRef = useRef();
@@ -37,7 +38,7 @@ const VideoComponent = ({ videoURL, thumbnail, control = true }) => {
     <div data-vjs-player className="aspect-video">
       <video
         ref={videoRef}
-        className="video-js vjs-default-skin aspect-video"
+        className="video-js vjs-default-skin vjs-twitch-style aspect-video"
       />
     </div>
   );

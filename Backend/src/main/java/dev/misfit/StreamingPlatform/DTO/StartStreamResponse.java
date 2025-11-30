@@ -1,5 +1,6 @@
 package dev.misfit.StreamingPlatform.DTO;
 
+import dev.misfit.StreamingPlatform.utils.StreamStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,12 +12,13 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class StreamResponse {
+public class StartStreamResponse {
     private Long streamId;
     private String title;
+    private String streamKey;
+    private String description;
     private String url;
-    private Boolean isLive;
+    private StreamStatus status;
     private Instant startedAt;
     private String thumbnail;
-    private Long views;
 }

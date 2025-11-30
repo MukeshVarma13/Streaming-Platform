@@ -11,7 +11,7 @@ const IsUserFollowing = ({ streamerDetail }) => {
   const { userDetail } = useContext(UserContext);
   const [isOpen, setIsOpen] = useState(false);
   const [following, setFollowing] = useState(
-    streamerDetail.followers.includes(userDetail.id)
+    streamerDetail?.followers?.includes(userDetail.id)
   );
 
   const handleFollow = async () => {

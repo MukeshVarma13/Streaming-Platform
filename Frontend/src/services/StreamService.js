@@ -1,16 +1,7 @@
 import { axios } from "../config/AxiosHelper";
 import { axiosLive } from "../config/AxiosHelper";
 
-// const token =
-//   "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjUsInN1YiI6ImtpcmFAZ21haWwuY29tIiwiaXNzIjoiTVZSIiwiaWF0IjoxNzU1NzA4Mzk0LCJleHAiOjE3NTY3ODgzOTR9.SJ_YMGHqOXKQ0esVYRLdWzvGS-dRNJ8XS2DqXVj9Rgw";
-
-// const token =
-//   "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjIsInN1YiI6Im1pc2ZpdEBnbWFpbC5jb20iLCJpc3MiOiJNVlIiLCJpYXQiOjE3NTU4ODY3MjMsImV4cCI6MTc1Njk2NjcyM30.WjsDkF7zxdfLQC8DJaL7dKo7THlgUbtBnGe2qrp88go";
-
-const token =
-  "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjYsInN1YiI6Im11a2VzaDFAZ21haWwuY29tIiwiaXNzIjoiTVZSIiwiaWF0IjoxNzU3MzQ3NjMyLCJleHAiOjE3NTg0Mjc2MzJ9.5D6S2AM1Ocd4_qKe_It7z50k3nDp2spVqfOOuItkQ6A";
-
-localStorage.setItem("token", token); // remove and implement login
+const token = localStorage.getItem("token");
 
 // Get videos that are live
 export const GetLiveStreamVideo = async () => {
@@ -143,12 +134,15 @@ export const getstreamerDetails = async (streamerId) => {
 };
 
 // Get streams by category
-export const getCategories = async (term) => {
-  const response = await axios.get(`api/v1/videos/category?term=${term}`, {
-    headers: {
-      Authorization: token,
-    },
-  });
+export const getCategories = async (term, pageParam = 0) => {
+  const response = await axios.get(
+    `api/v1/videos/category?term=${term}?page=${pageParam}&size=15`,
+    {
+      headers: {
+        Authorization: token,
+      },
+    }
+  );
   return response.data;
 };
 
@@ -159,5 +153,83 @@ export const getByTags = async (term) => {
       Authorization: token,
     },
   });
+  return response.data;
+};
+
+// To sign in
+export const login = async (user) => {
+  try {
+    const response = await axios.post(`/login`, {
+      email: user.email,
+      password: user.password,
+    });
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(
+        error.response.data.message || "Invalid email or password"
+      );
+    } else if (error.request) {
+      throw new Error(
+        "Network error. Please check your connection and try again."
+      );
+    } else {
+      throw new Error("An unexpected error occurred. Please try again.");
+    }
+  }
+};
+
+export const sendOtp = async (email) => {
+  const response = await axios.post(`/send-otp?email=${email}`);
+  return response.data;
+};
+
+export const verifyOtp = async (email, otp) => {
+  const response = await axios.post(`/verify-otp?email=${email}&otp=${otp}`);
+  return response.data;
+};
+
+export const register = async (data) => {
+  const response = await axios.post("/register", data);
+  return response.data;
+};
+
+// Generate stream key
+export const generateKey = async () => {
+  const response = await axios.get("/api/stream-key");
+  return response.data;
+};
+
+// Start the stream
+export const startStream = async (formData) => {
+  try {
+    const response = await axios.post("/api/stream/start", formData, {
+      headers: {
+        Authorization: token,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
+// Preview the stream and wait for OBS to connect
+export const goLive = async (streamKey) => {
+  const response = await axios.post(
+    `/api/stream/setup?streamKey=${streamKey}`,
+    {},
+    {
+      headers: {
+        Authorization: token,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const streamComplete = async (streamKey) => {
+  const response = await axios.post(`/api/stream/complete?name=${streamKey}`);
   return response.data;
 };

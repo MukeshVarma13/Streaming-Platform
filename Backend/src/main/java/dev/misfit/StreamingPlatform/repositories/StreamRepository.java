@@ -1,11 +1,12 @@
 package dev.misfit.StreamingPlatform.repositories;
 
 import dev.misfit.StreamingPlatform.entities.Stream;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,11 +17,14 @@ public interface StreamRepository extends JpaRepository<Stream, Long> {
 //    @Query(value = "SELECT * FROM Streams WHERE description LIKE %:param% OR title LIKE %:param%", nativeQuery = true)
 //    List<Stream> findInDescriptionOrInTitle(@Param("param") String param);
 
-    List<Stream> findByDescriptionContaining(String param);
+    Page<Stream> findByDescriptionContaining(String param, Pageable pageable);
 
-    List<Stream> findByTitleContaining(String param);
+    Page<Stream> findByTitleContaining(String param, Pageable pageable);
 
-    List<Stream> findByTagsIn(Collection<String> tags);
+    Page<Stream> findByTagsIn(Collection<String> tags, Pageable pageable);
 
-    List<Stream> findByCategoriesIn(Collection<String> categories);
+    Page<Stream> findByCategoriesIn(Collection<String> categories, Pageable pageable);
+
+    Page<Stream> findByStreamer_UserId(Long userId, Pageable pageable);
+
 }

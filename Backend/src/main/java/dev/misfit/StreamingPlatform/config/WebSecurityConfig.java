@@ -43,8 +43,11 @@ public class WebSecurityConfig {
                         .requestMatchers(
                                 "/register",
                                 "/login",
+                                "/send-otp",
+                                "/verify-otp",
                                 "/api/auth/publish",
                                 "/api/stream/complete",
+                                "/api/stream-key",
                                 "/api/videos/**",
                                 "/api/v1/videos",
                                 "/api/v1/videos/live",

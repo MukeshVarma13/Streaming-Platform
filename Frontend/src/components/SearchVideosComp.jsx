@@ -20,13 +20,7 @@ const SearchVideosComp = ({ video }) => {
         <p>{video.likes.length} likes</p>
         <p>{video.description}</p>
         <div className="flex gap-2 items-center text-sm mt-2">
-          {video.categories.map((category, index) => {
-            return (
-              <h2 className="text-grade capitalize" key={index}>
-                {category}
-              </h2>
-            );
-          })}
+          <h2 className="text-grade capitalize">{video.category}</h2>
           {video.tags.map((tag, index) => {
             return (
               <span

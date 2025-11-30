@@ -4,11 +4,12 @@ import { GoPerson } from "react-icons/go";
 import { MdIosShare } from "react-icons/md";
 import { PiDotsThreeOutlineVerticalFill } from "react-icons/pi";
 import ViewerCount from "./ViewerCount";
-import { addLike } from "../services/StreamService";
 import { baseURL } from "../config/AxiosHelper";
 import { UserContext } from "../context/UserDetailsContext";
 import { NavLink, useNavigate } from "react-router";
 import IsUserFollowing from "./IsUserFollowing";
+import { useMutation } from "@tanstack/react-query";
+import { likeStream } from "../api/streams.api";
 
 const ChannelContainer = ({ streamData, streamId }) => {
   const [like, setLike] = useState(false);
@@ -17,22 +18,26 @@ const ChannelContainer = ({ streamData, streamId }) => {
   const userId = userDetail.id;
   const navigate = useNavigate();
 
-  const handleLike = async () => {
-    setLike(!like);
-    const result = await addLike(streamId, !like);
-    setLikeCount(result);
-    // console.log(result);
+  const handleLike = () => {
+    mutate({ streamId, like: !like });
   };
 
-  // console.log(streamData);
+  const { mutate, isPending, isError } = useMutation({
+    mutationFn: ({ streamId, like }) => likeStream(streamId, like),
+    onSuccess: (data) => {
+      setLikeCount(data.data);
+      setLike((prev) => !prev);
+    },
+  });
 
   useEffect(() => {
+    if (!streamData) return;
     setLike(streamData.likes.includes(userId));
     setLikeCount(streamData.likes.length);
   }, []);
 
   return (
-    <div className="flex justify-between">
+    <div className="flex md:justify-between md:flex-row flex-col md:gap-0 gap-4">
       <div className="flex gap-2.5 items-end">
         <NavLink
           className="h-20 w-20 rounded-full relative"
@@ -58,26 +63,22 @@ const ChannelContainer = ({ streamData, streamId }) => {
           <div className="flex flex-col justify-center gap-1">
             <p className="first-letter:uppercase">{streamData.title}</p>
             <div className="flex gap-2 items-center">
-              {streamData.categories.map((category, index) => {
-                return (
-                  <h2
-                    className="text-grade capitalize cursor-pointer"
-                    key={index}
-                    onClick={() => {
-                      navigate(`/directory/category/${category}`);
-                    }}
-                  >
-                    {category}
-                  </h2>
-                );
-              })}
+              <h2
+                className="text-grade capitalize cursor-pointer"
+                onClick={() => {
+                  navigate(`/directory/${streamData.categories}`);
+                }}
+              >
+                {streamData.categories}
+              </h2>
+
               {streamData.tags.map((tag, index) => {
                 return (
                   <span
                     className="bg-[#29292E] rounded-2xl px-2 capitalize text-center cursor-pointer"
                     key={index}
                     onClick={() => {
-                      navigate(`/directory/tags/${tag}`);
+                      navigate(`/directory/tag/${tag}`);
                     }}
                   >
                     {tag}
@@ -91,7 +92,7 @@ const ChannelContainer = ({ streamData, streamId }) => {
       <div className="flex flex-col items-end gap-2">
         <div className="flex gap-2">
           <span
-            className="flex gap-2 items-center border px-4 py-1.5 rounded-full font-semibold bg-theme"
+            className="flex gap-2 items-center border px-4 py-1.5 rounded-full font-semibold bg-theme cursor-pointer"
             onClick={handleLike}
           >
             {like ? <BiSolidLike size={18} /> : <BiLike size={18} />}
