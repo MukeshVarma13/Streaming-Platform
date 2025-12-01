@@ -2,7 +2,7 @@ import { useRef } from "react";
 import TopStreamerCard from "./TopStreamerCard";
 import { GrFormNextLink, GrFormPreviousLink } from "react-icons/gr";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { topStreamers } from "../api/streams.api";
+import { topStreamers } from "../../api/streams.api";
 
 const TopStreamers = ({ title }) => {
   const streamerRef = useRef(null);
@@ -39,6 +39,7 @@ const TopStreamers = ({ title }) => {
   if (isLoading) {
     return <div>Loading...</div>;
   }
+  
   return (
     <div className="w-full">
       <div className="flex justify-between">

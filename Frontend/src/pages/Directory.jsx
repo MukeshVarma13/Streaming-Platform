@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router";
 import CategoryComp from "../components/CategoryComp";
-import VideoCard from "../components/VideoCard";
+import VideoCard from "../components/videos/VideoCard";
 import { getByCategories } from "../api/streams.api";
 import useInfiniteScrollContext from "../context/useInfiniteScrollContext";
 

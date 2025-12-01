@@ -85,6 +85,3 @@ const App = () => {
 };
 
 export default App;
-
-
-// video-js vjs-default-skin aspect-video vjs-fluid vjs_video_3-dimensions vjs-controls-enabled vjs-workinghover vjs-v8 vjs-playing vjs-has-started vjs-user-inactive vjs-layout-medium

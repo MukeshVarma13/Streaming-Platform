@@ -1,4 +1,4 @@
-import { baseURL } from "../api/axios";
+import { baseURL } from "../../api/axios";
 
 const TopStreamerCard = ({ streamer }) => {
   const profile = streamer?.profilePic

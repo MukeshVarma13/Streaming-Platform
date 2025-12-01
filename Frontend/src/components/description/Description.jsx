@@ -9,7 +9,7 @@ const Description = ({ streamData }) => {
   );
 
   return (
-    <div className="w-11/12 mx-auto">
+    <div className="">
       <h1 className="text-xl mb-1.5">
         About {streamData.streamUserResponse.name}
       </h1>

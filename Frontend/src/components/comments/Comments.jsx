@@ -1,7 +1,7 @@
 import { IoSend } from "react-icons/io5";
 import { LiaComments } from "react-icons/lia";
-import { useStreamChat } from "../context/useStreamChat";
-import { baseURL } from "../api/axios";
+import { useStreamChat } from "../../context/useStreamChat";
+import { baseURL } from "../../api/axios"; 
 
 const Comments = ({ streamId }) => {
   const {

@@ -3,13 +3,13 @@ import { BiLike, BiSolidLike } from "react-icons/bi";
 import { GoPerson } from "react-icons/go";
 import { MdIosShare } from "react-icons/md";
 import { PiDotsThreeOutlineVerticalFill } from "react-icons/pi";
-import ViewerCount from "./ViewerCount";
-import { baseURL } from "../config/AxiosHelper";
-import { UserContext } from "../context/UserDetailsContext";
+import ViewerCount from "../ViewerCount";
+import { baseURL } from "../../api/axios"; 
+import { UserContext } from "../../context/UserDetailsContext"; 
 import { NavLink, useNavigate } from "react-router";
-import IsUserFollowing from "./IsUserFollowing";
+import IsUserFollowing from "../IsUserFollowing";
 import { useMutation } from "@tanstack/react-query";
-import { likeStream } from "../api/streams.api";
+import { likeStream } from "../../api/streams.api"; 
 
 const ChannelContainer = ({ streamData, streamId }) => {
   const [like, setLike] = useState(false);
