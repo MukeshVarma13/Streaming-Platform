@@ -1,11 +1,11 @@
 import MainCarosel from "../components/MainCarosel";
-import VideoList from "../components/videos/VideoList";
+import VideoList from "../components/videosContainer/VideoList";
 import TopStreamers from "../components/topStreamers/TopStreamers";
 import CategoryComp from "../components/CategoryComp";
 import { getAllStreams, getLiveStreams } from "../api/streams.api";
 import useInfiniteScrollContext from "../context/useInfiniteScrollContext";
 import TopStreamersSkeleton from "../components/topStreamers/TopStreamersSkeleton";
-import VideosCardSkeleton from "../components/videos/VideosCardSkeleton";
+import VideosCardSkeleton from "../components/videosContainer/VideosCardSkeleton";
 import { IoIosArrowForward } from "react-icons/io";
 
 const Home = () => {

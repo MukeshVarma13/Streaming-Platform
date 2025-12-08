@@ -5,6 +5,7 @@ import dev.misfit.StreamingPlatform.utils.StreamStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -18,7 +19,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Stream {
+public class Stream implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

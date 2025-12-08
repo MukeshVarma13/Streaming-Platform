@@ -75,10 +75,10 @@ const WatchStream = () => {
         <div className="h-full col-span-3 md:col-span-4 overflow-y-scroll no-scrollbar">
           <div
             className={`border-b-[1px] relative bg-black ${
-              showComments ? "" : "lg:h-10/12 md:flex md:justify-center"
+              showComments ? "" : "lg:h-10/12 md:flex md:justify-center "
             } `}
           >
-            <div className="aspect-video">
+            <div className="aspect-video min-h-full max-lg:min-w-full lg:max-h-[80%]">
               <button
                 onClick={() => setShowComments(!showComments)}
                 className="absolute right-1 top-1 md:top-3 z-10 h-fit hover:bg-white/20 p-1 rounded-full duration-300"

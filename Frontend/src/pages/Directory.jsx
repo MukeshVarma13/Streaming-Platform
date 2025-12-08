@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router";
 import CategoryComp from "../components/CategoryComp";
-import VideoCard from "../components/videos/VideoCard";
+import VideoCard from "../components/videosContainer/VideoCard";
 import { getByCategories } from "../api/streams.api";
 import useInfiniteScrollContext from "../context/useInfiniteScrollContext";
 
@@ -37,16 +37,11 @@ const Directory = () => {
       <div className="">
         <CategoryComp />
       </div>
-      <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
         {streams.length > 0 ? (
-          <div>
-            {streams.map((stream, index) => {
-              return <VideoCard stream={stream} index={index} key={index} />;
-            })}
-            <div ref={observerRef} className="h-10">
-              {isFetchingNextPage && "Loading..."}
-            </div>
-          </div>
+          streams?.map((stream, index) => {
+            return <VideoCard stream={stream} index={index} key={index} />;
+          })
         ) : (
           <div className="w-full flex flex-col items-center gap-4">
             <h1 className="text-3xl">OOP's Nothing Found</h1>
@@ -59,6 +54,11 @@ const Directory = () => {
           </div>
         )}
       </div>
+      {hasNextPage && (
+        <div ref={observerRef} className="h-2">
+          {isFetchingNextPage && "Loading more..."}
+        </div>
+      )}
     </div>
   );
 };

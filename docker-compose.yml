@@ -1,0 +1,75 @@
+services:
+
+  backend:
+    build: ./backend
+    container_name: streaming-backend
+    depends_on:
+      - mysql
+      - redis
+      - elasticsearch
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    volumes:
+      - videos:/videos
+      - profilepics:/profile-pics
+
+  frontend:
+    build: ./frontend
+    container_name: streaming-frontend
+    ports:
+      - "5177:3000"
+
+  nginx-rtmp:
+    build: ./nginx-rtmp
+    container_name: rtmp-server
+    ports:
+      - "1935:1935"
+      - "8081:80"
+    volumes:
+      - videos:/videos
+      - profilepics:/profile-pics
+
+  ffmpeg-worker:
+    build: ./ffmpeg-worker
+    container_name: stream-converter
+    depends_on:
+      - redis
+    volumes:
+      - videos:/videos
+    environment:
+      REDIS_HOST: redis
+
+  redis:
+    image: redis:alpine
+    container_name: redis-cache
+    ports:
+      - "6379:6379"
+
+  mysql:
+    image: mysql:8
+    container_name: mysql-db
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: streaming
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.0
+    container_name: es
+    environment:
+      discovery.type: single-node
+    ports:
+      - "9200:9200"
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+
+volumes:
+  videos:
+  mysql-data:
+  es-data:
+  profilepics:
