@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.util.Set;
 
 @Component
@@ -14,7 +15,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Data
 @Builder
-public class StreamerResponse {
+public class StreamerResponse implements Serializable {
     private Long id;
     private String profilePic;
     private String name;

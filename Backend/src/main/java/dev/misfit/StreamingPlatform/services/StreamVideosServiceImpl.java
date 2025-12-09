@@ -1,6 +1,7 @@
 package dev.misfit.StreamingPlatform.services;
 
 import dev.misfit.StreamingPlatform.DTO.ChatResponse;
+import dev.misfit.StreamingPlatform.DTO.PageResponse;
 import dev.misfit.StreamingPlatform.DTO.StreamVideosResponse;
 import dev.misfit.StreamingPlatform.DTO.StreamerResponse;
 import dev.misfit.StreamingPlatform.customExceptions.StreamNotFoundException;
@@ -11,12 +12,13 @@ import dev.misfit.StreamingPlatform.entities.User;
 import dev.misfit.StreamingPlatform.repositories.StreamRepository;
 import dev.misfit.StreamingPlatform.repositories.UserRepository;
 import dev.misfit.StreamingPlatform.utils.StreamStatus;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,18 +35,24 @@ public class StreamVideosServiceImpl implements StreamVideosService {
     }
 
     @Override
-    public Page<StreamVideosResponse> getActiveStreams(Pageable pageable) {
+    @Cacheable(value = "streams-live", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
+    public PageResponse<StreamVideosResponse> getActiveStreams(Pageable pageable) {
         Page<Stream> pagedStreams = streamRepository.findAll(pageable);
         List<StreamVideosResponse> liveStreams = pagedStreams
                 .stream()
                 .filter(stream -> stream.getStatus().equals(StreamStatus.LIVE))
                 .map(this::convertToStreamVideoResponse)
                 .toList();
-        return new PageImpl<>(liveStreams, pageable, pagedStreams.getTotalElements());
+
+        return new PageResponse<>(liveStreams,
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                pagedStreams.getTotalElements());
     }
 
     @Override
-    public Page<StreamVideosResponse> getStreamedVideos(Pageable pageable) {
+    @Cacheable(value = "streamed-videos", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
+    public PageResponse<StreamVideosResponse> getStreamedVideos(Pageable pageable) {
         Page<Stream> pagedStreams = streamRepository.findAll(pageable);
 
         List<StreamVideosResponse> streams = pagedStreams
@@ -52,7 +60,13 @@ public class StreamVideosServiceImpl implements StreamVideosService {
                 .filter(stream -> stream.getStatus().equals(StreamStatus.ENDED))
                 .map(this::convertToStreamVideoResponse)
                 .toList();
-        return new PageImpl<>(streams, pageable, pagedStreams.getTotalElements());
+
+        return new PageResponse<>(
+                streams,
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                pagedStreams.getTotalElements()
+        );
     }
 
     @Override
@@ -99,7 +113,8 @@ public class StreamVideosServiceImpl implements StreamVideosService {
     }
 
     @Override
-    public Page<StreamerResponse> topFollowedStreamers(Pageable pageable) {
+    @Cacheable(value = "top-streamers", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
+    public PageResponse<StreamerResponse> topFollowedStreamers(Pageable pageable) {
         Page<User> pagedUsers = userRepository.findAll(pageable);
         List<StreamerResponse> sortedUsers = pagedUsers
                 .getContent()
@@ -107,10 +122,14 @@ public class StreamVideosServiceImpl implements StreamVideosService {
                 .sorted((a, b) -> b.getFollowers().size() - a.getFollowers().size())
                 .map(this::convertToStreamUserResponse)
                 .toList();
-        return new PageImpl<>(sortedUsers, pageable, pagedUsers.getTotalElements());
+        return new PageResponse<>(sortedUsers,
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                pagedUsers.getTotalElements());
     }
 
     @Override
+    @Cacheable(value = "watch-stream", key = "#streamId")
     public StreamVideosResponse watchStream(Long streamId) {
         Stream stream = streamRepository.findById(streamId)
                 .orElseThrow(() -> new StreamNotFoundException("Stream not found"));
@@ -118,6 +137,7 @@ public class StreamVideosServiceImpl implements StreamVideosService {
     }
 
     @Override
+    @Cacheable(value = "stream-msg", key = "#streamId")
     public List<ChatResponse> getChatMessages(Long streamId) {
         Stream stream = streamRepository.findById(streamId)
                 .orElseThrow(() -> new StreamNotFoundException("Stream not found"));
@@ -127,6 +147,7 @@ public class StreamVideosServiceImpl implements StreamVideosService {
     }
 
     @Override
+    @Cacheable(value = "logged-user", key = "#userId")
     public StreamerResponse getLoggedUser(Long userId, String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User Not found"));
@@ -137,33 +158,73 @@ public class StreamVideosServiceImpl implements StreamVideosService {
     }
 
     @Override
-    public Page<StreamVideosResponse> searchInDescription(String find, Pageable pageable) {
+    public PageResponse<StreamVideosResponse> searchInDescription(String find, Pageable pageable) {
         Page<Stream> streams = streamRepository.findByDescriptionContaining(find, pageable);
-        return streams.map(this::convertToStreamVideoResponse);
+        List<StreamVideosResponse> videosResponseList = streams
+                .stream()
+                .map(this::convertToStreamVideoResponse)
+                .toList();
+
+        return new PageResponse<>(videosResponseList,
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                streams.getTotalElements());
     }
 
     @Override
-    public Page<StreamVideosResponse> searchInTitle(String find, Pageable pageable) {
+    public PageResponse<StreamVideosResponse> searchInTitle(String find, Pageable pageable) {
         Page<Stream> streams = streamRepository.findByTitleContaining(find, pageable);
-        return streams.map(this::convertToStreamVideoResponse);
+        List<StreamVideosResponse> videosResponseList = streams
+                .stream()
+                .map(this::convertToStreamVideoResponse)
+                .toList();
+
+        return new PageResponse<>(videosResponseList,
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                streams.getTotalElements());
     }
 
     @Override
-    public Page<StreamerResponse> getStreamByUserName(String term, Pageable pageable) {
+    public PageResponse<StreamerResponse> getStreamByUserName(String term, Pageable pageable) {
         Page<User> users = userRepository.findByNameContaining(term, pageable);
-        return users.map(this::convertToStreamUserResponse);
+        List<StreamerResponse> streamerResponses = users
+                .stream()
+                .map(this::convertToStreamUserResponse)
+                .toList();
+
+        return new PageResponse<>(streamerResponses,
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                users.getTotalElements());
     }
 
     @Override
-    public Page<StreamVideosResponse> findByTags(String term, Pageable pageable) {
+    public PageResponse<StreamVideosResponse> findByTags(String term, Pageable pageable) {
         Page<Stream> streamByTags = streamRepository.findByTagsIn(Collections.singleton(term), pageable);
-        return streamByTags.map(this::convertToStreamVideoResponse);
+        List<StreamVideosResponse> videosResponseList = streamByTags
+                .stream()
+                .map(this::convertToStreamVideoResponse)
+                .toList();
+
+        return new PageResponse<>(videosResponseList,
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                streamByTags.getTotalElements());
     }
 
     @Override
-    public Page<StreamVideosResponse> findByCategories(String term, Pageable pageable) {
+    public PageResponse<StreamVideosResponse> findByCategories(String term, Pageable pageable) {
         Page<Stream> pagedCategory = streamRepository.findByCategoriesIn(Collections.singleton(term), pageable);
-        return pagedCategory.map(this::convertToStreamVideoResponse);
+        List<StreamVideosResponse> videosResponseList = pagedCategory
+                .stream()
+                .map(this::convertToStreamVideoResponse)
+                .toList();
+
+        return new PageResponse<>(videosResponseList,
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                pagedCategory.getTotalElements());
     }
 
 //    public List<StreamVideosResponse> search(String find) {
@@ -198,7 +259,7 @@ public class StreamVideosServiceImpl implements StreamVideosService {
                 .streamUserResponse(user)
                 .thumbnail(stream.getThumbnail())
                 .categories(stream.getCategories())
-                .tags(stream.getTags())
+                .tags(new ArrayList<>(stream.getTags()))
                 .build();
     }
 
