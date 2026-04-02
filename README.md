@@ -62,7 +62,7 @@ Make sure you have:
 ### 1. Clone the Repository
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/MukeshVarma13/Streaming-Platform.git
 cd RTMP-SERVER
 ```
 
@@ -217,8 +217,3 @@ volumes:
 Full Stack Developer (Java + React)
 
 ---
-
-If you want, I can next:
-
-* Add **docker-compose.yml (production-ready)**
-* Or make this README **GitHub-level polished with badges + screenshots**
