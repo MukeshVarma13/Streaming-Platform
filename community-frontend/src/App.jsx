@@ -7,6 +7,7 @@ import MembersSidebar from "./components/MembersSidebar";
 import CreateServerModal from "./components/modals/CreateServerModal";
 import CreateChannelModal from "./components/modals/CreateChannelModal";
 import VoicePanel from "./components/modals/VoicePanel";
+import Sidebar from "./components/Sidebar";
 
 function App() {
   // --- States ---
@@ -183,6 +184,7 @@ function App() {
   // --- JSX Layout ---
   return (
     <div className="flex h-screen overflow-hidden bg-[#202225] text-white">
+      {/* <Sidebar/> */}
       <ServerSidebar
         servers={servers}
         currentServerId={currentServerId}
@@ -209,7 +211,7 @@ function App() {
         sendMessage={sendMessage}
       />
 
-      {/* <MembersSidebar /> */}
+      <MembersSidebar />
 
       {showCreateServerModal && (
         <CreateServerModal

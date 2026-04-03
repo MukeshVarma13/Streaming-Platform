@@ -1,5 +1,5 @@
 {
-  "name": "community-frontend",
+  "name": "test-for-all",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,13 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^7.2.0",
-    "@tailwindcss/vite": "^4.2.2",
-    "lucide-react": "^1.7.0",
+    "@stomp/stompjs": "^7.3.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "react-router": "^7.13.2",
-    "tailwindcss": "^4.2.2"
+    "react-stomp": "^5.1.0",
+    "sockjs": "^0.3.24",
+    "sockjs-client": "^1.6.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
