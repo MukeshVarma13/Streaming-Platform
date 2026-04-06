@@ -1,6 +1,7 @@
 package dev.misfit.StreamingPlatform.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import dev.misfit.StreamingPlatform.DTO.Content;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,7 +21,9 @@ public class ChannelMessage {
     @EqualsAndHashCode.Include
     private Long id;
 
-    private String content;
+    @Embedded
+    private Content content;
+
     private LocalDateTime timestamp;
 
     @ManyToOne

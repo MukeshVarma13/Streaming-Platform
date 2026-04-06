@@ -14,13 +14,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.setApplicationDestinationPrefixes("/app"); // for incoming
-        config.enableSimpleBroker("/topic");
+        config.setApplicationDestinationPrefixes("/app"); // for incoming and send to MessageMapping "/app/sendMessage/{streamId}"
+        config.enableSimpleBroker("/topic"); // Don't know its use yet
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/chat")
+        registry.addEndpoint("/chat") // used to make connection just like RequestMapping all the chats endpoint starting from /chat is marked as webSocket's
                 .setAllowedOriginPatterns("*")
                 .withSockJS(); // WebSocket endpoint for connection establishment
     }

@@ -1,12 +1,18 @@
 import React, { useState } from "react";
+import { NavLink } from "react-router";
 
 const CommunityChannels = ({
-  currentServer,
-  setChannelType,
+  community,
+  currentChannelId = 3,
+  setCurrentChannelId,
+  isInVoice,
+  joinVoice,
   setShowCreateChannelModal,
-  currentChannelId,
+  setChannelType,
 }) => {
-    const [openChannel, setOpenChannel] = useState(false);
+  const [openChannel, setOpenChannel] = useState(false);
+  // console.log(community);
+
   return (
     <div className="max-w-full flex flex-col">
       {/* Server Header */}
@@ -15,7 +21,7 @@ const CommunityChannels = ({
         className="h-12 bg-[#2f3136] border-b border-[#202225] flex items-center px-3 font-semibold cursor-pointer hover:bg-[#393c43]"
       >
         <span className="flex-1 truncate">
-          {currentServer ? currentServer.name : "Select a server"}
+          {community ? community?.communityName : "Select a server"}
         </span>
         {openChannel ? (
           <i className="fa-solid fa-chevron-up text-xs" />
@@ -40,26 +46,29 @@ const CommunityChannels = ({
 
           {/* Text Channels List */}
           <div className="mt-1">
-            {currentServer?.channels
-              .filter((c) => c.type === "text")
+            {community?.channels
+              .filter((c) => c.type == "TEXT")
               .map((channel) => (
-                <div
-                  key={channel.id}
-                  onClick={() => setCurrentChannelId(channel.id)}
+                <NavLink
+                  to={`/community/${channel.channelId}`}
+                  key={channel.channelId}
+                  onClick={() => {
+                    setCurrentChannelId(channel.channelId);
+                  }}
                   className={`channel-item flex items-center gap-2 px-4 py-2 mx-2 rounded group cursor-pointer mb-0.5 ${
-                    currentChannelId === channel.id
+                    currentChannelId === channel.channelId
                       ? "bg-[#393c43] text-white"
                       : "text-[#949ba4] hover:text-white"
                   }`}
                 >
                   <i className="fa-solid fa-hashtag text-lg opacity-60" />
-                  <span className="flex-1 truncate">{channel.name}</span>
+                  <span className="flex-1 truncate">{channel.channelName}</span>
                   {channel.unread > 0 && (
                     <span className="bg-[#f04747] text-white text-[10px] px-2 py-px rounded-full font-bold">
                       {channel.unread}
                     </span>
                   )}
-                </div>
+                </NavLink>
               ))}
           </div>
 
@@ -77,20 +86,20 @@ const CommunityChannels = ({
 
           {/* Voice Channels List */}
           <div className="mt-1">
-            {currentServer?.channels
-              .filter((c) => c.type === "voice")
+            {community?.channels
+              .filter((c) => c.type == "VIDEO")
               .map((channel) => (
                 <div
-                  key={channel.id}
+                  key={channel.channelId}
                   onClick={() => joinVoice(channel)}
                   className={`channel-item flex items-center gap-2 px-4 py-2 mx-2 rounded group cursor-pointer mb-0.5 ${
-                    currentChannelId === channel.id && isInVoice
+                    currentChannelId === channel?.channelId && true
                       ? "bg-[#393c43] text-white"
                       : "text-[#949ba4] hover:text-white"
                   }`}
                 >
                   <i className="fa-solid fa-microphone text-lg opacity-60" />
-                  <span className="flex-1 truncate">{channel.name}</span>
+                  <span className="flex-1 truncate">{channel.channelName}</span>
                   <span className="text-[#3ba55c] text-xs font-medium flex items-center gap-1">
                     <i className="fa-solid fa-user text-[10px]" />
                     {channel.usersInVoice || 0}

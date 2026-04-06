@@ -103,7 +103,7 @@ const Home = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col gap-5 pr-4">
+    <div className="h-screen flex flex-col gap-5 pr-4 w-full">
       <div className="flex w-full h-1/3 gap-3">
         <div className="w-full">
           <MainCarosel />

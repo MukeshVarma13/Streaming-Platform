@@ -66,7 +66,7 @@ const WatchStream = () => {
       : baseURL + streamData.streamSearch?.url;
 
   return (
-    <div className="fixed left-0 right-0 top-0 bottom-0 h-screen w-screen md:pl-44 md:pt-16 pt-2 overflow-hidden">
+    <div className="fixed left-0 right-0 top-0 bottom-0 h-screen w-screen md:pl-52 md:pt-16 pt-2 overflow-hidden">
       <div
         className={`grid ${
           showComments ? "grid-cols-5" : ""

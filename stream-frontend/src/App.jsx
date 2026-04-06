@@ -33,7 +33,7 @@ import CommunityApp from "./components/community/CommunityApp";
 const App = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   return (
-    <div>
+    <div className="h-screen">
       <Header onMenuToggle={() => setMenuOpen(!menuOpen)} />
       <Navbar open={menuOpen} setOpen={setMenuOpen} />
       <div className="md:hidden px-3 mt-20">
@@ -53,7 +53,7 @@ const App = () => {
             <Route path="about" element={<ChannelAbout />} /> {/*Not Done*/}
             <Route path="videos" element={<ChannelVideos />} /> {/*Done*/}
           </Route>
-          <Route path="/community/:guilt-id" element={<CommunityApp />} />
+          <Route path="/community/:channelId" element={<CommunityApp />} />
           {/*Done*/}
           <Route path="/stream" element={<Stream />}>
             <Route index element={<StartStream />} /> {/*Done*/}

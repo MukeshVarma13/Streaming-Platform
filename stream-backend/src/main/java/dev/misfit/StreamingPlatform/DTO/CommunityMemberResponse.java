@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CreateCommunity {
-
-    private String communityName;
-//    private String icon;
+public class CommunityMemberResponse {
+    private Long id;
+    private String profilePic;
+    private String name;
 }

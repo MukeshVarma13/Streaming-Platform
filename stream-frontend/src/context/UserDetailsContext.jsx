@@ -22,7 +22,7 @@ export const UserDetailProvider = (props) => {
       if (localStorage.getItem("token")) {
         setToken(localStorage.getItem("token"));
         const detail = await loggedUser();
-        setUserDetail(detail);
+        setUserDetail(detail.data);
       }
     }
     loadUserDetail();

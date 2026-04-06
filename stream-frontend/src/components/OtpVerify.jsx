@@ -13,7 +13,7 @@ const OtpVerify = () => {
     const user = JSON.parse(localStorage.getItem("pendingUser"));
     const res = await verifyOtp(user.email, otp);
 
-    if (res !== "OTP verified.") {
+    if (res.data !== "OTP verified.") {
       alert("Wrong OTP");
       return;
     }

@@ -16,7 +16,7 @@ const Comments = ({ streamId }) => {
 
   return (
     <div className="h-full bg-theme flex flex-col justify-between">
-      <h1 className="w-full py-1 md:py-2 flex px-4 items-center justify-between md:text-2xl border-b-[1px] border-white/20 font-semibol">
+      <h1 className="w-full py-1 md:py-2 flex px-4 items-center justify-between md:text-2xl border-b border-white/20 font-semibol">
         Stream Chat <LiaComments size={22} />
       </h1>
       <div

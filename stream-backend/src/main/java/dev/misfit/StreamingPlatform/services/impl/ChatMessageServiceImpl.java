@@ -1,15 +1,14 @@
 package dev.misfit.StreamingPlatform.services.impl;
 
-import dev.misfit.StreamingPlatform.entities.ChatMessage;
-import dev.misfit.StreamingPlatform.entities.Stream;
-import dev.misfit.StreamingPlatform.entities.User;
-import dev.misfit.StreamingPlatform.DTO.ChatRequest;
-import dev.misfit.StreamingPlatform.DTO.ChatResponse;
-import dev.misfit.StreamingPlatform.repositories.ChatMessageRepository;
-import dev.misfit.StreamingPlatform.repositories.StreamRepository;
-import dev.misfit.StreamingPlatform.repositories.UserRepository;
+import dev.misfit.StreamingPlatform.DTO.*;
+import dev.misfit.StreamingPlatform.customExceptions.ChannelNotFoundException;
+import dev.misfit.StreamingPlatform.customExceptions.CommunityNotFoundException;
+import dev.misfit.StreamingPlatform.customExceptions.UserNotFoundException;
+import dev.misfit.StreamingPlatform.entities.*;
+import dev.misfit.StreamingPlatform.repositories.*;
 import dev.misfit.StreamingPlatform.services.ChatMessageService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -20,11 +19,24 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
     private final StreamRepository streamRepository;
     private final UserRepository userRepository;
+    private final ChannelMessageRepository messageRepository;
+    private final ChannelRepository channelRepository;
+    private final CommunityRepository communityRepository;
 
-    public ChatMessageServiceImpl(ChatMessageRepository chatMessageRepository, StreamRepository streamRepository, UserRepository userRepository) {
+    public ChatMessageServiceImpl(
+            ChatMessageRepository chatMessageRepository,
+            StreamRepository streamRepository,
+            UserRepository userRepository,
+            ChannelMessageRepository messageRepository,
+            ChannelRepository channelRepository,
+            CommunityRepository communityRepository
+    ) {
         this.chatMessageRepository = chatMessageRepository;
         this.streamRepository = streamRepository;
         this.userRepository = userRepository;
+        this.messageRepository = messageRepository;
+        this.channelRepository = channelRepository;
+        this.communityRepository = communityRepository;
     }
 
 
@@ -39,6 +51,47 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         User user = userOptional.get();
         ChatMessage savedMessage = chatMessageRepository.save(convertToChatMessage(chatRequest, stream, user));
         return convertToChatResponse(savedMessage);
+    }
+
+    @Override
+    @Transactional
+    public ChannelContentResponse addChatToCommunityChannel(Long channelId, ChannelContentRequest request) {
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new UserNotFoundException("No user found for the given id"));
+        Channels channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new ChannelNotFoundException("No channel exists in the community"));
+        Community community = communityRepository.findById(channel.getCommunity().getId())
+                .orElseThrow(() -> new CommunityNotFoundException("community not found"));
+
+        ChannelMessage channelMessage = convertToChannelMessage(request, user, channel);
+        channelMessage.setChannel(channel);
+//        channel.getMessages().add(channelMessage);
+        communityRepository.save(community);
+        channelRepository.save(channel);
+        messageRepository.save(channelMessage);
+
+        return convertToChannelContentResponse(channelMessage);
+    }
+
+    private ChannelContentResponse convertToChannelContentResponse(ChannelMessage channelMessage) {
+        return ChannelContentResponse.builder()
+                .id(channelMessage.getId())
+                .content(channelMessage.getContent())
+                .userName(channelMessage.getSender().getName())
+                .userProfile(channelMessage.getSender().getProfilePic())
+                .build();
+    }
+
+    private ChannelMessage convertToChannelMessage(ChannelContentRequest request, User user, Channels channel) {
+        return ChannelMessage.builder()
+                .content(Content.builder()
+                        .content(request.getContent())
+                        .type(request.getContentType())
+                        .build()
+                )
+                .sender(user)
+                .channel(channel)
+                .build();
     }
 
     private ChatResponse convertToChatResponse(ChatMessage savedMessage) {

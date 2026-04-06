@@ -15,7 +15,8 @@ const Login = () => {
     e.preventDefault();
     try {
       const loginToken = await login(user);
-      localStorage.setItem("token", "Bearer " + loginToken.token);
+      // console.log(loginToken);
+      localStorage.setItem("token", "Bearer " + loginToken.data.token);
       window.location.href = "/";
     } catch (err) {
       alert(err.message);

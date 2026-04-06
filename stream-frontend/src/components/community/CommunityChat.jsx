@@ -1,26 +1,59 @@
-import React from "react";
 import WelcomeScreen from "./modals/WelcomeScreen";
 import ChannelWelcomeHeader from "./modals/ChannelWelcomeHeader";
 import VoiceChannelStage from "./VoiceChannelStage";
+import { channelDetail } from "../../api/community";
+import { useQuery } from "@tanstack/react-query";
+import useCommunityChat from "../../context/useCommunityChat";
 
-const CommunityChat = ({
-  currentChannel,
-  currentMessagesList,
-  newMessage,
-  setNewMessage,
-  sendMessage,
-}) => {
+const CommunityChat = ({ channelId }) => {
+  // const { channelId } = useParams();
+
+  const {
+    data: currentChannel,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["channel-details", channelId],
+    queryFn: () => channelDetail(channelId).then((res) => res.data),
+    enabled: !!channelId,
+  });
+
+  const {
+    chats: currentMessagesList,
+    input,
+    setInput,
+    sendMessage,
+    chatBoxRef,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+    isError: chatError,
+    isLoadingMessages,
+    isFetching,
+    observerRef,
+    inView,
+  } = useCommunityChat(channelId);
+
+  if (currentMessagesList) {
+    currentMessagesList.reverse();
+  }
+  // console.log(currentMessagesList);
+
+  if (!currentChannel || !currentMessagesList) {
+    return <div>Loading..</div>;
+  }
+
   return (
-    <div className="flex-1 flex flex-col bg-[#36393e]">
+    <div className="flex flex-col bg-[#36393e] h-full w-full">
       {/* Top Bar */}
       <div className="h-12 border-b border-[#202225] flex items-center px-4 shadow-sm">
-        {currentChannel?.type === "text" ? (
+        {currentChannel?.type === "TEXT" ? (
           <i className="fa-solid fa-hashtag text-[#949ba4] mr-2" />
         ) : (
           <i className="fa-solid fa-microphone text-[#949ba4] mr-2" />
         )}
         <div className="font-semibold">
-          {currentChannel ? currentChannel.name : "Welcome"}
+          {currentChannel ? currentChannel.channelName : "Welcome"}
         </div>
         <div className="flex-1" />
         <div className="flex items-center gap-4 text-[#949ba4]">
@@ -31,92 +64,109 @@ const CommunityChat = ({
         </div>
       </div>
 
-      {currentMessagesList.length > 0 ? (
-        <div className="flex-1 overflow-y-auto p-4 space-y-6">
-          {/* Content Area */}
-          {currentChannel?.type === "text" ? (
-            /* Chat Mode */
-            <div className="flex-1 overflow-y-auto p-4 space-y-6">
-              {currentMessagesList.map((msg) => (
-                <div key={msg.id} className="message flex gap-4 group">
-                  <div
-                    className="w-10 h-10 rounded-full shrink-0 flex items-center justify-center text-white text-xl"
-                    style={{ backgroundColor: msg.avatarColor }}
-                  >
-                    {msg.user === "You" ? "Y" : msg.user[0]}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-baseline gap-2">
-                      <span className="font-semibold cursor-pointer">
-                        {msg.user}
-                      </span>
-                      <span className="message-timestamp text-xs text-[#949ba4]">
-                        {msg.time}
-                      </span>
+      <div ref={chatBoxRef} className="overflow-y-scroll no-scrollbar w-full">
+        <div>
+          {currentMessagesList?.length > 0 ? (
+            <div className=" p-4 space-y-6 h-full">
+              {/* Content Area */}
+              {currentChannel?.type === "TEXT" ? (
+                /* Chat Mode */
+                <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                  {currentMessagesList?.map((msg) => (
+                    <div key={msg.id} className="message flex gap-4 group">
+                      <div
+                        className="w-10 h-10 rounded-full shrink-0 flex items-center justify-center text-white text-xl"
+                        style={{ backgroundColor: "violet" }}
+                      >
+                        {/* {msg.user === "You" ? "Y" : msg.user[0]} */}Y
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-baseline gap-2">
+                          <span className="font-semibold cursor-pointer">
+                            {msg.userName}
+                          </span>
+                          <span className="message-timestamp text-xs text-[#949ba4]">
+                            {msg.time}
+                          </span>
+                        </div>
+                        <div className="text-[#dcddde] leading-relaxed">
+                          {msg.content.content}
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-[#dcddde] leading-relaxed">
-                      {msg.content}
-                    </div>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          ) : (
-            /* Voice Connected Mode */
-            <div className="flex-1 flex items-center justify-center bg-linear-to-br from-[#2f3136] to-[#36393e] p-8">
-              <div className="text-center max-w-md">
-                <div className="text-6xl mb-6 animate-pulse">🎤</div>
-                <h2 className="text-3xl font-bold mb-2">Voice Connected</h2>
-                <p className="text-[#b9bbbe]">
-                  {currentChannel ? `In ${currentChannel.name}` : "Joining..."}
-                </p>
+              ) : (
+                /* Voice Connected Mode */
+                <div className="flex-1 flex items-center justify-center bg-linear-to-br from-[#2f3136] to-[#36393e] p-8">
+                  <div className="text-center max-w-md">
+                    <div className="text-6xl mb-6 animate-pulse">🎤</div>
+                    <h2 className="text-3xl font-bold mb-2">Voice Connected</h2>
+                    <p className="text-[#b9bbbe]">
+                      {currentChannel
+                        ? `In ${currentChannel.channelName}`
+                        : "Joining..."}
+                    </p>
 
-                {currentChannel?.type === "voice" && (
-                  <div className="mt-8 flex justify-center gap-8">
-                    <div className="flex flex-col items-center group cursor-pointer">
-                      <div className="w-12 h-12 bg-[#f04747] hover:bg-[#d83c3e] rounded-full flex items-center justify-center text-2xl transition-colors">
-                        📴
+                    {currentChannel?.type === "VIDEO" && (
+                      <div className="mt-8 flex justify-center gap-8">
+                        <div className="flex flex-col items-center group cursor-pointer">
+                          <div className="w-12 h-12 bg-[#f04747] hover:bg-[#d83c3e] rounded-full flex items-center justify-center text-2xl transition-colors">
+                            📴
+                          </div>
+                          <span className="text-xs mt-2 text-[#f04747] font-semibold">
+                            Leave
+                          </span>
+                        </div>
+                        <div className="flex flex-col items-center group cursor-pointer">
+                          <div className="w-12 h-12 bg-[#3ba55c] hover:bg-[#2d8047] rounded-full flex items-center justify-center text-2xl transition-colors">
+                            🎙️
+                          </div>
+                          <span className="text-xs mt-2 text-[#3ba55c] font-semibold">
+                            Mute
+                          </span>
+                        </div>
                       </div>
-                      <span className="text-xs mt-2 text-[#f04747] font-semibold">
-                        Leave
-                      </span>
-                    </div>
-                    <div className="flex flex-col items-center group cursor-pointer">
-                      <div className="w-12 h-12 bg-[#3ba55c] hover:bg-[#2d8047] rounded-full flex items-center justify-center text-2xl transition-colors">
-                        🎙️
-                      </div>
-                      <span className="text-xs mt-2 text-[#3ba55c] font-semibold">
-                        Mute
-                      </span>
+                    )}
+                    <div className="mt-12 text-[#949ba4] text-sm italic">
+                      Connected with 4 others
                     </div>
                   </div>
-                )}
-                <div className="mt-12 text-[#949ba4] text-sm italic">
-                  Connected with 4 others
                 </div>
-              </div>
+              )}
             </div>
+          ) : currentChannel?.channelName === "general" ? (
+            <WelcomeScreen serverName={"Misfits"} />
+          ) : currentChannel?.type == "text" ? (
+            <ChannelWelcomeHeader channelName={currentChannel.name} />
+          ) : (
+            currentChannel?.type == "voice" && <VoiceChannelStage />
           )}
         </div>
-      ) : currentChannel.name === "general" ? (
-        <WelcomeScreen serverName={"Misfits"} />
-      ) : currentChannel.type == "text" ? (
-        <ChannelWelcomeHeader channelName={currentChannel.name} />
-      ) : (
-        currentChannel.type == "voice" && <VoiceChannelStage />
-      )}
+      </div>
 
       {/* Message Input (Only visible in text channels) */}
-      {currentChannel?.type === "text" && (
-        <form onSubmit={sendMessage} className="px-4 pb-6">
+      {currentChannel?.type === "TEXT" && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            sendMessage();
+          }}
+          className="px-4 pb-6"
+        >
           <div className="bg-[#40444b] rounded-lg px-4 py-3 flex items-center shadow-inner">
             <i className="fa-solid fa-circle-plus text-[#b9bbbe] hover:text-white mr-4 text-xl cursor-pointer transition-colors" />
             <input
               type="text"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              // onKeyDown={(e) => {
+              //   if (e.key === "Enter") {
+              //     sendMessage();
+              //   }
+              // }}
               placeholder={
-                currentChannel ? `Message #${currentChannel.name}` : ""
+                currentChannel ? `Message #${currentChannel.channelName}` : ""
               }
               className="flex-1 bg-transparent outline-none text-white placeholder-[#72767d]"
             />

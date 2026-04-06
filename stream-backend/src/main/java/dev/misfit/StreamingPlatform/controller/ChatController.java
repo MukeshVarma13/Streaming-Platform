@@ -1,5 +1,7 @@
 package dev.misfit.StreamingPlatform.controller;
 
+import dev.misfit.StreamingPlatform.DTO.ChannelContentRequest;
+import dev.misfit.StreamingPlatform.DTO.ChannelContentResponse;
 import dev.misfit.StreamingPlatform.DTO.ChatRequest;
 import dev.misfit.StreamingPlatform.DTO.ChatResponse;
 import dev.misfit.StreamingPlatform.services.ChatMessageService;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
+
 @RestController
 @CrossOrigin("*")
 public class ChatController {
@@ -22,10 +26,18 @@ public class ChatController {
         this.messageService = messageService;
     }
 
-    @MessageMapping("/sendMessage/{streamId}")  // Receive from /app/sendMessage
-    @SendTo("/topic/stream/{streamId}") // send to subscribers of /topic/stream
+    @MessageMapping("/sendMessage/{streamId}")  // Receive from "/app/sendMessage/{streamId}" messages are sent to this end point to .publish method
+    @SendTo("/topic/stream/{streamId}") // Send to subscribers of "/topic/stream/{streamId}", used to publish messages to everyone connected to this endpoint used in .onConnect method
     public ChatResponse message(@DestinationVariable Long streamId, @RequestBody ChatRequest chatRequest, @AuthenticationPrincipal JwtUserPrincipal user) {
         System.out.println(user.getClaims());
         return messageService.addChat(streamId, chatRequest);
+    }
+
+    @MessageMapping("/community/{channelId}")
+    @SendTo("/topic/community/{channelId}")
+    public ChannelContentResponse communityChat(
+            @DestinationVariable Long channelId,
+            @RequestBody ChannelContentRequest request) {
+        return messageService.addChatToCommunityChannel( channelId, request);
     }
 }

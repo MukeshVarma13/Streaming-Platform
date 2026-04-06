@@ -12,7 +12,7 @@ const Register = () => {
     password: "",
   });
 
-  const handleSignupSubmit = async (e) => {
+  const handleSignupSubmit = async (e) => { 
     e.preventDefault();
     localStorage.setItem("pendingUser", JSON.stringify(newUser));
     const response = await sendOtp(newUser.email);

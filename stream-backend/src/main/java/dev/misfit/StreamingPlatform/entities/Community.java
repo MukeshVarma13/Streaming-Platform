@@ -47,4 +47,9 @@ public class Community {
     @ToString.Exclude
     @Builder.Default
     private Set<User> members = new HashSet<>();
+
+    public void addChannel(Channels channel) {
+        channels.add(channel);
+        channel.setCommunity(this);
+    }
 }
