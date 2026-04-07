@@ -5,7 +5,7 @@ const VoiceChatSplitView = () => {
   const [isCameraOff, setIsCameraOff] = useState(true);
 
   return (
-    <div className="flex flex-col h-screen w-full bg-black text-white font-sans overflow-hidden">
+    <div className="flex flex-col h-full w-full  text-white font-sans overflow-hidden">
       
       {/* --- Main Video Grid Area --- */}
       <div className="flex-1 flex flex-col p-4 gap-2 items-center justify-center max-w-5xl mx-auto w-full">
@@ -50,7 +50,7 @@ const VoiceChatSplitView = () => {
       </div>
 
       {/* --- Bottom Controls Bar --- */}
-      <div className="h-20 bg-black flex items-center justify-between px-6">
+      <div className="h-20 flex items-center justify-between px-6">
         {/* Left Side: Add Member */}
         <div>
           <button className="w-10 h-10 bg-transparent hover:bg-white/10 rounded-full flex items-center justify-center transition-colors">

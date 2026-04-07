@@ -9,11 +9,14 @@ import { NavLink, useNavigate } from "react-router";
 import IsUserFollowing from "../IsUserFollowing";
 import { useMutation } from "@tanstack/react-query";
 import { likeStream } from "../../api/streams.api";
+import DiscordInvite from "../community/modals/DiscordInvite";
+import { User } from "lucide-react";
 
 const ChannelContainer = ({ streamData, streamId, following }) => {
   const [like, setLike] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const navigate = useNavigate();
+  const [share, setShare] = useState(false);
 
   useEffect(() => {
     if (!streamData) return;
@@ -39,14 +42,18 @@ const ChannelContainer = ({ streamData, streamId, following }) => {
     <div className="flex md:justify-between md:flex-row flex-col md:gap-0 gap-4">
       <div className="flex gap-2.5 items-end">
         <NavLink
-          className="h-20 w-20 rounded-full relative"
+          className="h-20 w-20 rounded-full relative flex justify-center items-center"
           to={`/channel/${streamData?.streamerId}`}
         >
-          <img
-            src={baseURL + streamData?.streamerProfilePic}
-            alt=""
-            className="object-cover h-full w-full rounded-full bg-theme"
-          />
+          {streamData?.streamerProfilePic ? (
+            <img
+              src={baseURL + streamData?.streamerProfilePic}
+              alt=""
+              className="object-cover h-full w-full rounded-full bg-theme"
+            />
+          ) : (
+            <User className="p-2 rounded-full h-full w-full hover-theme" />
+          )}
           <div
             className={`absolute -bottom-1 w-full flex items-center justify-center ${
               streamData.isLive ? "" : "hidden"
@@ -107,9 +114,19 @@ const ChannelContainer = ({ streamData, streamId, following }) => {
             <GoPerson size={23} />
             <ViewerCount streamId={streamId} />
           </span>
-          <p className="rounded-full hover:text-indigo-500 hover:bg-gray-300 p-1.5">
+          <p
+            onClick={() => setShare(!share)}
+            className="rounded-full hover:text-indigo-500 hover:bg-gray-300 p-1.5"
+          >
             <MdIosShare size={23} />
           </p>
+          {share && (
+            <DiscordInvite
+              share={share}
+              setShare={setShare}
+              inviteLink={"http://localhost:5173/stream/" + streamId}
+            />
+          )}
           <p className="rounded-full hover:text-indigo-500 hover:bg-gray-300 p-1.5">
             <PiDotsThreeOutlineVerticalFill size={23} />
           </p>

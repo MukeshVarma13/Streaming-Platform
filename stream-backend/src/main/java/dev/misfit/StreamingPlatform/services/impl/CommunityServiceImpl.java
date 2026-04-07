@@ -3,6 +3,7 @@ package dev.misfit.StreamingPlatform.services.impl;
 import dev.misfit.StreamingPlatform.DTO.*;
 import dev.misfit.StreamingPlatform.customExceptions.ChannelNotFoundException;
 import dev.misfit.StreamingPlatform.customExceptions.CommunityNotFoundException;
+import dev.misfit.StreamingPlatform.customExceptions.UnauthorizedUserException;
 import dev.misfit.StreamingPlatform.customExceptions.UserNotFoundException;
 import dev.misfit.StreamingPlatform.entities.ChannelMessage;
 import dev.misfit.StreamingPlatform.entities.Channels;
@@ -77,6 +78,10 @@ public class CommunityServiceImpl implements CommunityService {
         Community community = communityRepository.findById(communityId)
                 .orElseThrow(() -> new CommunityNotFoundException("Community not found"));
 
+        if (community.getMembers().contains(joiningUser)) {
+            return;
+        }
+
         community.getMembers().add(joiningUser);
         joiningUser.getMember().add(community);
 
@@ -130,6 +135,43 @@ public class CommunityServiceImpl implements CommunityService {
         return convertToCommunityChannelResponse(channel);
     }
 
+    @Override
+    public Set<CommunityMemberResponse> getAllMembersOfChannels(Long channelId) {
+        Channels channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new ChannelNotFoundException("No channel found"));
+        Community community = channel.getCommunity();
+        Set<User> members = community.getMembers();
+        return members.stream().map(this::convertToCommunityMemberResponse).collect(Collectors.toSet());
+    }
+
+    @Override
+    @Transactional
+    public CreateChannelResponse createChannel(CreateChannelRequest request, Long memberId) {
+        User user = userRepository.findById(memberId)
+                .orElseThrow(() -> new UserNotFoundException("User Not found"));
+
+        if (user.getOwnedCommunity() == null) {
+            throw new UnauthorizedUserException("User not authorized to create channels");
+        }
+
+        Community ownedCommunity = user.getOwnedCommunity();
+
+        Channels savedChannel = channelRepository.save(
+                Channels.builder()
+                .channelName(request.getChannelName())
+                .community(ownedCommunity)
+                .type(request.getType())
+                .build()
+        );
+
+        ownedCommunity.getChannels().add(savedChannel);
+        communityRepository.save(ownedCommunity);
+        return CreateChannelResponse.builder()
+                .channelId(savedChannel.getId())
+                .channelName(savedChannel.getChannelName())
+                .type(savedChannel.getType())
+                .build();
+    }
 
     private Channels defaultChannel(ChannelType type, String channelName) {
         return Channels.builder()
@@ -145,7 +187,7 @@ public class CommunityServiceImpl implements CommunityService {
                 .icon(community.getIcon())
                 .owner(convertToCommunityMemberResponse(community.getOwner()))
                 .channels(community.getChannels().stream().map(channel -> convertToCommunityChannelResponse(channel)).toList())
-                .members(community.getMembers().stream().map(member -> convertToCommunityMemberResponse(member)).collect(Collectors.toSet()))
+//                .members(community.getMembers().stream().map(member -> convertToCommunityMemberResponse(member)).collect(Collectors.toSet()))
                 .build();
 
     }

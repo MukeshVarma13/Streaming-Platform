@@ -25,20 +25,71 @@ import Register from "./components/Register";
 import OtpVerify from "./components/OtpVerify";
 import StartStream from "./pages/SartStream";
 import StreamPreview from "./pages/StreamPreview";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import SearchBar from "./components/SearchBar";
 import Stream from "./pages/Stream";
 import CommunityApp from "./components/community/CommunityApp";
+import VoiceChannelStage from "./components/community/VoiceChannelStage";
+import CreateServerModal from "./components/community/modals/CreateServerModal";
+import CreateChannelModal from "./components/community/modals/CreateChannelModal";
+import VoicePanel from "./components/community/modals/VoicePanel";
+import { UserContext } from "./context/UserDetailsContext";
+import JoinServer from "./components/JoinServer";
 
 const App = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showVoicePanel, setShowVoicePanel] = useState(false);
+  const [isInVoice, setIsInVoice] = useState(false);
+  const [serverNameInput, setServerNameInput] = useState("");
+  const [selectedTemplate, setSelectedTemplate] = useState("gaming");
+  const [channelNameInput, setChannelNameInput] = useState("");
+  const {
+    showCreateChannelModal,
+    setShowCreateChannelModal,
+    channelType,
+    setChannelType,
+    showCreateServerModal,
+    setShowCreateServerModal,
+    invite,
+    setInvite,
+  } = useContext(UserContext);
+
   return (
-    <div className="h-screen">
+    <div className="h-screen bg-transparent">
       <Header onMenuToggle={() => setMenuOpen(!menuOpen)} />
       <Navbar open={menuOpen} setOpen={setMenuOpen} />
       <div className="md:hidden px-3 mt-20">
         <SearchBar />
       </div>
+      {showCreateServerModal && (
+        <CreateServerModal
+          showCreateServerModal={showCreateServerModal}
+          setShowCreateServerModal={setShowCreateServerModal}
+          serverNameInput={serverNameInput}
+          setServerNameInput={setServerNameInput}
+          selectedTemplate={selectedTemplate}
+          setSelectedTemplate={setSelectedTemplate}
+          // createServer={createServer}
+        />
+      )}
+
+      {invite && <JoinServer />}
+      {showCreateChannelModal && (
+        <CreateChannelModal
+          showCreateChannelModal={showCreateChannelModal}
+          setShowCreateChannelModal={setShowCreateChannelModal}
+          channelType={channelType}
+          setChannelType={setChannelType}
+        />
+      )}
+
+      {showVoicePanel && (
+        <VoicePanel
+          showVoicePanel={showVoicePanel}
+          // currentChannel={currentChannel}
+          // leaveVoice={leaveVoice}
+        />
+      )}
       <div
         className={`pt-2 md:pt-[9.2vh] w-full h-full mix-grade2 backdrop-blur-2xl ${
           menuOpen ? "md:pl-56" : "md:pl-56"
@@ -53,7 +104,11 @@ const App = () => {
             <Route path="about" element={<ChannelAbout />} /> {/*Not Done*/}
             <Route path="videos" element={<ChannelVideos />} /> {/*Done*/}
           </Route>
-          <Route path="/community/:channelId" element={<CommunityApp />} />
+          <Route
+            path="/community/channel/:channelId"
+            element={<CommunityApp />}
+          />
+          <Route path="/community/voice/:id" element={<VoiceChannelStage />} />
           {/*Done*/}
           <Route path="/stream" element={<Stream />}>
             <Route index element={<StartStream />} /> {/*Done*/}

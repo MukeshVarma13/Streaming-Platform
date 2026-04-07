@@ -1,4 +1,4 @@
-
+import { User } from "lucide-react";
 import { baseURL } from "../api/axios";
 import IsUserFollowing from "./IsUserFollowing";
 
@@ -7,11 +7,15 @@ const ChannelUserDetail = ({ streamerDetails, latestStreamVideo }) => {
     <div className="flex flex-col gap-2">
       <div className="bg-purple-5 flex items-center my-4 gap-4">
         <div className="h-28 w-28 rounded-full relative">
-          <img
-            src={baseURL + streamerDetails?.profilePic}
-            alt=""
-            className="w-full h-full rounded-full object-cover bg-theme"
-          />
+          {streamerDetails?.profilePic ? (
+            <img
+              src={baseURL + streamerDetails?.profilePic}
+              alt=""
+              className="w-full h-full rounded-full object-cover bg-theme"
+            />
+          ) : (
+            <User className="p-2 rounded-full h-full w-full hover-theme" />
+          )}
           <div
             className={`absolute -bottom-1 w-full flex items-center justify-center ${
               latestStreamVideo?.status == "LIVE" ? "" : "hidden"

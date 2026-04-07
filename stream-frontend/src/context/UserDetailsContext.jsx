@@ -7,6 +7,11 @@ export const UserContext = createContext(null);
 export const UserDetailProvider = (props) => {
   const [token, setToken] = useState("");
   const [userDetail, setUserDetail] = useState();
+  const [showCreateChannelModal, setShowCreateChannelModal] = useState(false);
+  const [channelType, setChannelType] = useState("text");
+  const [showCreateServerModal, setShowCreateServerModal] = useState(false);
+  const [invite, setInvite] = useState(false);
+
   // const {
   //   data: userDetail,
   //   isLoading,
@@ -31,6 +36,14 @@ export const UserDetailProvider = (props) => {
   const contextValue = {
     token,
     userDetail,
+    setShowCreateChannelModal,
+    setChannelType,
+    showCreateChannelModal,
+    channelType,
+    showCreateServerModal,
+    setShowCreateServerModal,
+    invite,
+    setInvite,
   };
 
   return (

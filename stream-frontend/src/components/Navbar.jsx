@@ -27,7 +27,7 @@ const Navbar = ({ open, setOpen }) => {
           navigate={navigate}
         />
         <EndTag name={"Community"} />
-        <div className="px-1">
+        <div className="px-3">
           <input
             type="text"
             placeholder="Search..."
@@ -37,15 +37,17 @@ const Navbar = ({ open, setOpen }) => {
               if (e.key === "Enter")
                 navigate(`/directory/tag/${category.toLowerCase()}`);
             }}
-            className="w-full px-3 py-1.5 text-sm rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-2 mt-3"
+            className="w-full px-3 py-1.5 text-sm rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 mt-3"
           />
         </div>
         <CommunitySideBar />
+        <EndTag name={"End"} />
+        <div className="mb-28"></div>
       </aside>
       {/* MOBILE DRAWER */}
       <aside
         className={`
-          fixed top-0 left-0 bottom-0 w-64 bg-theme text-white z-30 py-3
+          fixed top-0 left-0 bottom-0 w-64 bg-theme text-white z-30 py-3 overflow-x-scroll no-scrollbar h-full
           transform transition-transform duration-300
           ${open ? "translate-x-0" : "-translate-x-full"}
           md:hidden
@@ -63,7 +65,7 @@ const Navbar = ({ open, setOpen }) => {
           navigate={navigate}
         />
         <EndTag name={"Community"} />
-        <div className="px-1">
+        <div className="px-3">
           <input
             type="text"
             placeholder="Search..."
@@ -77,6 +79,7 @@ const Navbar = ({ open, setOpen }) => {
           />
         </div>
         <CommunitySideBar />
+        <EndTag name={"End"} />
       </aside>
     </>
   );

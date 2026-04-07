@@ -7,7 +7,11 @@ export const getChannelChats = (channelId, pageParam = 0) => {
 };
 
 export const createCommunity = (communityDetails) => {
-  return http.post("/api/v1/community/create", communityDetails);
+  return http.post("/api/v1/community/create", communityDetails, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 };
 
 export const joinCommunity = (communityId) => {
@@ -20,4 +24,16 @@ export const communityDetails = () => {
 
 export const channelDetail = (channelId) => {
   return http.get(`/api/v1/community/channel/${channelId}`);
+};
+
+export const channelMembers = (channelId) => {
+  return http.get(`/api/v1/community/channel/members/${channelId}`);
+};
+
+export const createChannel = (channelDetails) => {
+  return http.post("/api/v1/community/create/channel", channelDetails, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 };

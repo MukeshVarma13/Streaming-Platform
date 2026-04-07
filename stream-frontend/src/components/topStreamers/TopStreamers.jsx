@@ -23,7 +23,7 @@ const TopStreamers = ({ title }) => {
   });
   // console.log(data);
   
-  const streamers = data?.pages?.flatMap((page) => page.content);
+  const streamers = data?.pages?.flatMap((page) => page.content).toReversed();
 
   const scrollLeft = () => {
     if (streamerRef.current) {

@@ -17,4 +17,8 @@ public interface CommunityService {
     PageResponse<ChannelContentResponse> getChannelMessages(Long channelId, Pageable pageable );
 
     CommunityChannelResponse getChannelDetails(Long channelId);
+
+    Set<CommunityMemberResponse> getAllMembersOfChannels(Long channelId);
+
+    CreateChannelResponse createChannel(CreateChannelRequest request, Long memberId);
 }

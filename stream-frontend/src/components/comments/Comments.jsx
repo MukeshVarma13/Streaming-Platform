@@ -1,7 +1,8 @@
 import { IoSend } from "react-icons/io5";
 import { LiaComments } from "react-icons/lia";
 import { useStreamChat } from "../../context/useStreamChat";
-import { baseURL } from "../../api/axios"; 
+import { baseURL } from "../../api/axios";
+import { User } from "lucide-react";
 
 const Comments = ({ streamId }) => {
   const {
@@ -38,11 +39,15 @@ const Comments = ({ streamId }) => {
                 <div key={index} className="w-full mb-1.5">
                   <div className="flex gap-1">
                     <div className="w-6 h-6 shrink-0 rounded-full">
-                      <img
-                        src={baseURL + message.userProfile}
-                        alt=""
-                        className="w-full h-full object-cover rounded-full bg-white/5"
-                      />
+                      {message.userProfile ? (
+                        <img
+                          src={baseURL + message.userProfile}
+                          alt=""
+                          className="w-full h-full object-cover rounded-full bg-white/5"
+                        />
+                      ) : (
+                        <User className="rounded-full h-full w-full p-1 hover-theme" />
+                      )}
                     </div>
                     <p
                       className="font-semibold shrink-0 text-sm"

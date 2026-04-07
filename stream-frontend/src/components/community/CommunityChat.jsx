@@ -4,8 +4,9 @@ import VoiceChannelStage from "./VoiceChannelStage";
 import { channelDetail } from "../../api/community";
 import { useQuery } from "@tanstack/react-query";
 import useCommunityChat from "../../context/useCommunityChat";
+import { Loader } from "lucide-react";
 
-const CommunityChat = ({ channelId }) => {
+const CommunityChat = ({ channelId, openMembers, setOpenMembers }) => {
   // const { channelId } = useParams();
 
   const {
@@ -52,33 +53,49 @@ const CommunityChat = ({ channelId }) => {
         ) : (
           <i className="fa-solid fa-microphone text-[#949ba4] mr-2" />
         )}
-        <div className="font-semibold">
+        <div className="font-semibold h-12 flex items-center text-xl">
           {currentChannel ? currentChannel.channelName : "Welcome"}
         </div>
         <div className="flex-1" />
         <div className="flex items-center gap-4 text-[#949ba4]">
           <i className="fa-solid fa-magnifying-glass cursor-pointer hover:text-white" />
-          <i className="fa-solid fa-user-group cursor-pointer hover:text-white" />
+          <i
+            onClick={() => setOpenMembers(!openMembers)}
+            className="fa-solid fa-user-group cursor-pointer hover:text-white"
+          />
           <div className="w-px h-6 bg-[#202225]" />
           <i className="fa-solid fa-bell cursor-pointer hover:text-white" />
         </div>
       </div>
 
-      <div ref={chatBoxRef} className="overflow-y-scroll no-scrollbar w-full">
-        <div>
+      <div ref={chatBoxRef} className="overflow-y-scroll no-scrollbar w-full h-full">
+        <div className="h-full">
+          <div className="h-full flex">
+            <ChannelWelcomeHeader channelName={currentChannel.channelName} />
+          </div>
           {currentMessagesList?.length > 0 ? (
-            <div className=" p-4 space-y-6 h-full">
+            <div className="space-y-6 h-full">
               {/* Content Area */}
               {currentChannel?.type === "TEXT" ? (
                 /* Chat Mode */
-                <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                  {hasNextPage && (
+                    <div
+                      ref={observerRef}
+                      className="flex w-full items-center justify-center"
+                    >
+                      {isFetchingNextPage && (
+                        <Loader size={30} className="animate-spin" />
+                      )}
+                    </div>
+                  )}
                   {currentMessagesList?.map((msg) => (
                     <div key={msg.id} className="message flex gap-4 group">
                       <div
                         className="w-10 h-10 rounded-full shrink-0 flex items-center justify-center text-white text-xl"
-                        style={{ backgroundColor: "violet" }}
+                        style={{ backgroundColor: "#faa61a" }}
                       >
-                        {/* {msg.user === "You" ? "Y" : msg.user[0]} */}Y
+                        {msg.userName[0]}
                       </div>
                       <div className="flex-1">
                         <div className="flex items-baseline gap-2">
@@ -135,12 +152,8 @@ const CommunityChat = ({ channelId }) => {
                 </div>
               )}
             </div>
-          ) : currentChannel?.channelName === "general" ? (
-            <WelcomeScreen serverName={"Misfits"} />
-          ) : currentChannel?.type == "text" ? (
-            <ChannelWelcomeHeader channelName={currentChannel.name} />
           ) : (
-            currentChannel?.type == "voice" && <VoiceChannelStage />
+            currentChannel?.type == "VIDEO" && <VoiceChannelStage />
           )}
         </div>
       </div>

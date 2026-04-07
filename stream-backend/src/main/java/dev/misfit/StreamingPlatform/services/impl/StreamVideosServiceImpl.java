@@ -64,7 +64,7 @@ public class StreamVideosServiceImpl implements StreamVideosService {
         User follower = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        SearchUser followerInES = searchUserRepository.findById(userId)
+        SearchUser followerInES = searchUserRepository.findById(follower.getUserId())
                 .orElseThrow(() -> new UserNotFoundException("User not found in ES"));
 
         User streamer = userRepository.findById(streamerId)

@@ -2,7 +2,7 @@ import React from "react";
 
 const ChannelWelcomeHeader = ({ channelName = "clips-and-highlights" }) => {
   return (
-    <div className="flex flex-col items-start justify-end p-4 mb-8 select-none animate-in fade-in slide-in-from-bottom-2 duration-500 flex-1">
+    <div className="flex flex-col items-start justify-end p-4 select-none animate-in fade-in slide-in-from-bottom-2 duration-500 flex-1">
       {/* The large Hashtag Circle */}
       <div className="w-16 h-16 bg-[#4f545c] rounded-full flex items-center justify-center mb-4 shadow-lg">
         <i className="fa-solid fa-hashtag text-white text-4xl" />
@@ -28,7 +28,7 @@ const ChannelWelcomeHeader = ({ channelName = "clips-and-highlights" }) => {
       </button>
 
       {/* Divider */}
-      <div className="w-full h-px bg-[#4f545c] mt-8 opacity-30" />
+      <div className="w-full h-px bg-[#4f545c] mt-4 opacity-30" />
     </div>
   );
 };

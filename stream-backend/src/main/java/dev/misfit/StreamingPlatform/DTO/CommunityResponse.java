@@ -14,5 +14,5 @@ public class CommunityResponse {
     private String icon;
     private CommunityMemberResponse owner;
     private List<CommunityChannelResponse> channels;
-    private Set<CommunityMemberResponse> members;
+//    private Set<CommunityMemberResponse> members;
 }

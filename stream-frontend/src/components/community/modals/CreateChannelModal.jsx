@@ -1,29 +1,62 @@
-import React from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { createChannel } from "../../../api/community";
+import { useNavigate } from "react-router";
 
 const CreateChannelModal = ({
   showCreateChannelModal,
   setShowCreateChannelModal,
-  channelNameInput,
-  setChannelNameInput,
   channelType,
   setChannelType,
-  createChannel,
 }) => {
   if (!showCreateChannelModal) return null;
 
+  const [channelNameInput, setChannelNameInput] = useState("");
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const { mutate, isPending, error } = useMutation({
+    mutationFn: (details) => createChannel(details),
+    onSuccess: (data) => {
+      // console.log(data);
+      setShowCreateChannelModal(false);
+      queryClient.invalidateQueries({ queryKey: ["community-details"] });
+      navigate(`/community/channel/${data.data.channelId}`);
+    },
+    onError: (err) => {
+      console.error(err);
+      alert("Failed to create channel");
+    },
+  });
+
+  const create = () => {
+    const channelDetails = {
+      channelName: channelNameInput,
+      type: channelType,
+    };
+    // console.log(channelDetails);
+    mutate(channelDetails);
+  };
+
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-      <div className="modal-anim bg-[#36393e] w-full max-w-md rounded-xl shadow-2xl overflow-hidden">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          create();
+        }}
+        className="modal-anim bg-[#36393e] w-full max-w-md rounded-xl shadow-2xl overflow-hidden"
+      >
         <div className="px-6 py-6">
           <h2 className="text-xl font-bold text-white">Create Channel</h2>
 
           <div className="flex gap-4 mt-6">
             {/* Text Channel Option */}
             <button
-              onClick={() => setChannelType("text")}
+              onClick={() => setChannelType("TEXT")}
               className={`flex-1 py-4 rounded-xl flex flex-col items-center transition-all duration-200 ${
-                channelType === "text"
-                  ? "bg-[#5865f2] text-white shadow-lg"
+                channelType === "TEXT"
+                  ? "body-theme text-white shadow-lg"
                   : "bg-[#2f3136] text-[#b9bbbe] hover:bg-[#393c43]"
               }`}
             >
@@ -33,10 +66,10 @@ const CreateChannelModal = ({
 
             {/* Voice Channel Option */}
             <button
-              onClick={() => setChannelType("voice")}
+              onClick={() => setChannelType("VIDEO")}
               className={`flex-1 py-4 rounded-xl flex flex-col items-center transition-all duration-200 ${
-                channelType === "voice"
-                  ? "bg-[#5865f2] text-white shadow-lg"
+                channelType === "VIDEO"
+                  ? "body-theme text-white shadow-lg"
                   : "bg-[#2f3136] text-[#b9bbbe] hover:bg-[#393c43]"
               }`}
             >
@@ -51,9 +84,10 @@ const CreateChannelModal = ({
             </label>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#949ba4] text-xl">
-                {channelType === "text" ? "#" : "🔊"}
+                {channelType === "TEXT" ? "#" : "🔊"}
               </span>
               <input
+                required={true}
                 type="text"
                 value={channelNameInput}
                 onChange={(e) => setChannelNameInput(e.target.value)}
@@ -72,13 +106,13 @@ const CreateChannelModal = ({
             Cancel
           </button>
           <button
-            onClick={createChannel}
-            className="bg-[#5865f2] hover:bg-[#4752c4] px-8 py-2 rounded text-white font-semibold transition-all shadow-md active:scale-95"
+            // onClick={createChannel}
+            className="body-theme hover:bg-[#4752c4] px-8 py-2 rounded text-white font-semibold transition-all shadow-md active:scale-95"
           >
             Create Channel
           </button>
         </div>
-      </div>
+      </form>
     </div>
   );
 };

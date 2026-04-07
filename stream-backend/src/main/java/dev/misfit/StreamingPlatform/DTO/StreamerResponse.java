@@ -24,4 +24,7 @@ public class StreamerResponse implements Serializable {
     private Boolean isFollowing;
     private Set<Long> likedStreams;
     private Page<StreamVideosResponse> streamVideosResponse;
+    private Long communityId;
+    private String communityName;
+    private Long firstChannelId;
 }

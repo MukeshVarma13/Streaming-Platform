@@ -1,6 +1,7 @@
 package dev.misfit.StreamingPlatform.controller;
 
 import dev.misfit.StreamingPlatform.DTO.ChannelContentResponse;
+import dev.misfit.StreamingPlatform.DTO.CreateChannelRequest;
 import dev.misfit.StreamingPlatform.DTO.CreateCommunity;
 import dev.misfit.StreamingPlatform.DTO.PageResponse;
 import dev.misfit.StreamingPlatform.services.CommunityService;
@@ -61,5 +62,16 @@ public class CommunityController {
     @GetMapping("/channel/{channelId}")
     public ResponseEntity<?> getChannelDetails(@PathVariable Long channelId) {
         return ResponseEntity.ok(communityService.getChannelDetails(channelId));
+    }
+
+    @GetMapping("/channel/members/{channelId}")
+    public ResponseEntity<?> getAllMembersOfChannels(@PathVariable Long channelId) {
+        return ResponseEntity.ok(communityService.getAllMembersOfChannels(channelId));
+    }
+
+    @PostMapping("/create/channel")
+    public ResponseEntity<?> createChannel(@RequestBody CreateChannelRequest request, @AuthenticationPrincipal JwtUserPrincipal userPrincipal){
+        Long memberId = userPrincipal.getClaims().get("userId", Long.class);
+        return ResponseEntity.status(200).body(communityService.createChannel(request, memberId));
     }
 }

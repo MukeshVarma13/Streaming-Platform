@@ -1,10 +1,10 @@
 import React from "react";
 
 const VoicePanel = ({ showVoicePanel, currentChannel, leaveVoice }) => {
-  if (!showVoicePanel) return null;
+  // if (!showVoicePanel) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 bg-[#292b2f] rounded-2xl shadow-2xl w-80 border border-[#5865f2] overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
+    <div className="fixed bottom-6 right-6 bg-[#292b2f] rounded-2xl shadow-2xl w-80 border border-[#5865f2] overflow-hidden animate-in slide-in-from-bottom-4 duration-300 z-10">
       {/* Header */}
       <div className="px-4 py-3 bg-[#5865f2] text-white flex items-center justify-between text-sm font-semibold">
         <div className="flex items-center gap-2">
@@ -12,7 +12,7 @@ const VoicePanel = ({ showVoicePanel, currentChannel, leaveVoice }) => {
           <span>Voice Connected</span>
         </div>
         <i
-          onClick={leaveVoice}
+          // onClick={leaveVoice}
           className="fa-solid fa-xmark cursor-pointer hover:rotate-90 transition-transform p-1"
         />
       </div>

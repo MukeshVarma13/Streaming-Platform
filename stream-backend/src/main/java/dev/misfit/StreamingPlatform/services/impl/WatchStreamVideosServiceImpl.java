@@ -62,6 +62,9 @@ public class WatchStreamVideosServiceImpl implements WatchStreamVideosService {
                 .followersCount(searchUser.getFollowersCount())
                 .isFollowing(searchUser.getFollowers().contains(userId))
                 .streamVideosResponse(map)
+                .communityId(user.getOwnedCommunity().getId())
+                .communityName(user.getOwnedCommunity().getCommunityName())
+                .firstChannelId(user.getOwnedCommunity().getChannels().getFirst().getId())
                 .build();
     }
 

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, use, useContext } from "react";
 import { Link, NavLink } from "react-router";
 import { UserContext } from "../context/UserDetailsContext";
 import { baseURL } from "../api/axios";
+import { User } from "lucide-react";
 
 export default function ProfileMenu() {
   const [open, setOpen] = useState(false);
@@ -21,7 +22,6 @@ export default function ProfileMenu() {
   }, []);
 
   const handleLogout = () => {
-    // console.log("Logout clicked");
     localStorage.removeItem("token");
     window.location.href = "/";
   };
@@ -71,11 +71,15 @@ export default function ProfileMenu() {
           onClick={toggleDropdown}
           className="py-1 flex items-center gap-2 px-3 hover-theme rounded-lg"
         >
-          <img
-            src={baseURL + "/" + userDetail?.profilePic}
-            alt=""
-            className="h-10 w-10 rounded-full object-cover"
-          />
+          {userDetail?.profilePic ? (
+            <img
+              src={baseURL + "/" + userDetail?.profilePic}
+              alt=""
+              className="h-10 w-10 rounded-full object-cover"
+            />
+          ) : (
+            <User />
+          )}
           <div className="flex flex-col items-start pr-2">
             <span className="font-bold text-sm">{userDetail.name}</span>
             <span className="text-xs text-red-400">Online</span>

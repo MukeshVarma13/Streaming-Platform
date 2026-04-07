@@ -1,16 +1,17 @@
 import { NavLink, useNavigate } from "react-router";
 import { baseURL } from "../../api/axios";
+import { User } from "lucide-react";
 
 const VideoCard = ({ stream }) => {
   // console.log(stream);
   // console.log(baseURL + stream?.thumbnail);
-  
+
   const navigate = useNavigate();
   return (
     <div className="flex flex-col gap-2">
       <NavLink to={`/stream/${stream?.id}`} className="aspect-video rounded">
         <img
-          src={baseURL +  stream?.thumbnail}
+          src={baseURL + stream?.thumbnail}
           alt=""
           loading="lazy"
           className="aspect-video w-full h-full bg-theme rounded"
@@ -19,14 +20,18 @@ const VideoCard = ({ stream }) => {
       <div className="flex gap-2 capitalize items-center">
         <NavLink
           to={`/channel/${stream?.streamerId}`}
-          className="w-12 h-12 rounded-full"
+          className="w-12 h-12 rounded-full flex items-center justify-center"
         >
-          <img
-            src={baseURL + stream?.streamerProfilePic}
-            alt=""
-            loading="lazy"
-            className="w-full h-full rounded-full object-cover bg-theme"
-          />
+          {stream?.streamerProfilePic ? (
+            <img
+              src={baseURL + stream?.streamerProfilePic}
+              alt=""
+              loading="lazy"
+              className="w-full h-full rounded-full object-cover bg-theme"
+            />
+          ) : (
+            <User className="m-2 p-1 rounded-full shrink-0 hover-theme" size={43}/>
+          )}
         </NavLink>
         <div>
           <div

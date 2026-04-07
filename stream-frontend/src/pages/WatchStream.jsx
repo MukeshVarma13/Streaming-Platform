@@ -15,7 +15,6 @@ import CommentsSkeleton from "../components/comments/CommentsSkeleton";
 const WatchStream = () => {
   const { streamId } = useParams();
   const [showComments, setShowComments] = useState(true);
-
   const {
     data: streamData,
     isLoading,

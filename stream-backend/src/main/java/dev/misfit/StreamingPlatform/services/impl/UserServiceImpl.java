@@ -5,7 +5,9 @@ import dev.misfit.StreamingPlatform.DTO.LoginResponse;
 import dev.misfit.StreamingPlatform.DTO.RegisterRequest;
 import dev.misfit.StreamingPlatform.customExceptions.UnauthorizedUserException;
 import dev.misfit.StreamingPlatform.customExceptions.UserNotFoundException;
+import dev.misfit.StreamingPlatform.entities.SearchUser;
 import dev.misfit.StreamingPlatform.entities.User;
+import dev.misfit.StreamingPlatform.repositories.SearchUserRepository;
 import dev.misfit.StreamingPlatform.repositories.UserRepository;
 import dev.misfit.StreamingPlatform.services.UserService;
 import dev.misfit.StreamingPlatform.utils.JwtUtil;
@@ -16,12 +18,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.stream.Collectors;
+
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final SearchUserRepository searchUserRepository;
     private final JwtUtil jwtUtil;
     @Value("${profile-picture.path}")
     private String profilePicPath;
@@ -29,11 +34,12 @@ public class UserServiceImpl implements UserService {
     public UserServiceImpl(
             UserRepository userRepository,
             BCryptPasswordEncoder bCryptPasswordEncoder,
-            AuthenticationManager authenticationManager,
+            AuthenticationManager authenticationManager, SearchUserRepository searchUserRepository,
             JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.authenticationManager = authenticationManager;
+        this.searchUserRepository = searchUserRepository;
         this.jwtUtil = jwtUtil;
     }
 
@@ -52,7 +58,16 @@ public class UserServiceImpl implements UserService {
 //        Files.copy(file.getInputStream(), filePath);
 
 //        user.setProfilePic("/profile-pic/" + fileName);
-        userRepository.save(user);
+        User saved = userRepository.save(user);
+
+        SearchUser searchUser = SearchUser.builder()
+                .id(saved.getUserId())
+                .profilePic(saved.getProfilePic())
+                .name(saved.getName())
+                .followers(saved.getFollowers().stream().map(user1 -> user1.getUserId()).collect(Collectors.toSet()))
+                .followersCount(saved.getFollowers().size())
+                .build();
+        searchUserRepository.save(searchUser);
         return true;
 
     }

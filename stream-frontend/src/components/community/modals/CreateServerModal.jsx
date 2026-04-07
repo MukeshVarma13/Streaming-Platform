@@ -1,76 +1,118 @@
-import React from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import React, { useState } from "react";
+import { FaLaptopCode, FaPodcast } from "react-icons/fa";
+import { IoMdMusicalNotes } from "react-icons/io";
+import { IoGameControllerOutline } from "react-icons/io5";
+import { LuMic } from "react-icons/lu";
+import { createCommunity } from "../../../api/community";
 
 const CreateServerModal = ({
   showCreateServerModal,
   setShowCreateServerModal,
-  serverNameInput,
-  setServerNameInput,
-  selectedTemplate,
-  setSelectedTemplate,
-  createServer,
 }) => {
   if (!showCreateServerModal) return null;
 
+  const [serverNameInput, setServerNameInput] = useState("");
+  const [selectedTemplate, setSelectedTemplate] = useState("");
+  const queryClient = useQueryClient();
+
+  const { mutate, isPending, error } = useMutation({
+    mutationFn: (details) => createCommunity(details),
+    onSuccess: (data) => {
+      setShowCreateServerModal(false);
+      queryClient.invalidateQueries({ queryKey: ["community-details"] });
+    },
+    onError: (err) => {
+      console.error(err);
+      alert("Failed to create community");
+    },
+  });
+
+  const createServer = () => {
+    const details = {
+      communityName: serverNameInput,
+    };
+    mutate(details);
+  };
+
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-      <div className="modal-anim bg-[#36393e] w-full max-w-md rounded-xl shadow-2xl overflow-hidden">
+      <div className="modal-anim hover-theme w-full max-w-md rounded-xl shadow-2xl overflow-hidden">
         <div className="px-6 pt-6 pb-4">
-          <h2 className="text-2xl font-bold text-center text-white">Create Your Server</h2>
+          <h2 className="text-2xl font-bold text-center text-white">
+            Create Your Server
+          </h2>
           <p className="text-[#b9bbbe] text-center mt-2 text-sm">
             Choose a template or start from scratch
           </p>
-
           <div className="grid grid-cols-2 gap-4 mt-8">
-            {/* Gaming Template */}
             <div
               onClick={() => setSelectedTemplate("gaming")}
               className={`p-4 rounded-xl border-2 flex flex-col items-center cursor-pointer transition-all ${
-                selectedTemplate === "gaming" 
-                  ? "border-[#5865f2] bg-[#40444b]" 
+                selectedTemplate === "gaming"
+                  ? "border-[#5865f2] bg-theme"
                   : "border-transparent bg-[#2f3136] hover:border-[#5865f2]"
               }`}
             >
-              <div className="text-5xl mb-3">🎮</div>
+              <div className="text-5xl mb-3">
+                <IoGameControllerOutline />
+              </div>
               <div className="font-semibold text-white">Gaming</div>
             </div>
-
-            {/* Chilling Template */}
             <div
-              onClick={() => setSelectedTemplate("chilling")}
+              onClick={() => setSelectedTemplate("irl")}
               className={`p-4 rounded-xl border-2 flex flex-col items-center cursor-pointer transition-all ${
-                selectedTemplate === "chilling" 
-                  ? "border-[#3ba55c] bg-[#40444b]" 
+                selectedTemplate === "chilling"
+                  ? "border-[#3ba55c] bg-theme"
                   : "border-transparent bg-[#2f3136] hover:border-[#3ba55c]"
               }`}
             >
-              <div className="text-5xl mb-3">🌿</div>
-              <div className="font-semibold text-white">Chilling</div>
+              <div className="text-5xl mb-3">
+                <LuMic />
+              </div>
+              <div className="font-semibold text-white">IRL</div>
             </div>
-
-            {/* Podcast Template */}
             <div
-              onClick={() => setSelectedTemplate("podcast")}
+              onClick={() => setSelectedTemplate("Music")}
               className={`p-4 rounded-xl border-2 flex flex-col items-center cursor-pointer transition-all ${
-                selectedTemplate === "podcast" 
-                  ? "border-[#faa61a] bg-[#40444b]" 
+                selectedTemplate === "podcast"
+                  ? "border-[#faa61a] bg-[#40444b]"
                   : "border-transparent bg-[#2f3136] hover:border-[#faa61a]"
               }`}
             >
-              <div className="text-5xl mb-3">🎙️</div>
-              <div className="font-semibold text-white">Podcast</div>
+              <div className="text-5xl mb-3">
+                <IoMdMusicalNotes />
+              </div>
+              <div className="font-semibold text-white">Music</div>
+            </div>
+
+            <div
+              onClick={() => setSelectedTemplate("Coding")}
+              className={`p-4 rounded-xl border-2 flex flex-col items-center cursor-pointer transition-all ${
+                selectedTemplate === "podcast"
+                  ? "border-[#faa61a] bg-[#40444b]"
+                  : "border-transparent bg-[#2f3136] hover:border-[#faa61a]"
+              }`}
+            >
+              <div className="text-5xl mb-3">
+                <FaLaptopCode />
+              </div>
+              <div className="font-semibold text-white">Coding</div>
             </div>
 
             {/* Study Template */}
             <div
-              onClick={() => setSelectedTemplate("study")}
+              onClick={() => setSelectedTemplate("Podcast")}
               className={`p-4 rounded-xl border-2 flex flex-col items-center cursor-pointer transition-all ${
-                selectedTemplate === "study" 
-                  ? "border-[#7289da] bg-[#40444b]" 
+                selectedTemplate === "study"
+                  ? "border-[#7289da] bg-[#40444b]"
                   : "border-transparent bg-[#2f3136] hover:border-[#7289da]"
               }`}
             >
-              <div className="text-5xl mb-3">📚</div>
-              <div className="font-semibold text-white">Study</div>
+              <div className="text-5xl mb-3">
+                <FaPodcast />
+              </div>
+              <div className="font-semibold text-white">Podcast</div>
             </div>
           </div>
 
@@ -87,7 +129,7 @@ const CreateServerModal = ({
           </div>
         </div>
 
-        <div className="bg-[#2f3136] px-6 py-4 flex justify-end gap-4 border-t border-[#202225]">
+        <div className="bg-theme px-6 py-4 flex justify-end gap-4 border-t border-[#202225]">
           <button
             onClick={() => setShowCreateServerModal(false)}
             className="px-4 py-2 text-white font-medium hover:underline transition-all"
@@ -96,7 +138,7 @@ const CreateServerModal = ({
           </button>
           <button
             onClick={createServer}
-            className="px-6 py-2 bg-[#5865f2] hover:bg-[#4752c4] text-white font-semibold rounded transition-all shadow-lg active:scale-95"
+            className="px-6 py-2 body-theme text-white font-semibold rounded transition-all shadow-lg active:scale-95"
           >
             Create Server
           </button>

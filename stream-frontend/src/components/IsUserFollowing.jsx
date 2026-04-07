@@ -1,26 +1,43 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { FaRegHeart } from "react-icons/fa";
 import { LiaUserFriendsSolid } from "react-icons/lia";
 import { RiDislikeLine } from "react-icons/ri";
-import { UserContext } from "../context/UserDetailsContext";
 import { followStreamer } from "../api/streams.api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router";
+import { joinCommunity } from "../api/community";
 
 const IsUserFollowing = ({ streamerDetail, isfollowing }) => {
-  const { userDetail } = useContext(UserContext);
   const [isOpen, setIsOpen] = useState(false);
   const [following, setFollowing] = useState(isfollowing);
-
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const streamerId = streamerDetail?.streamerId || streamerDetail?.id;
 
   const handleFollow = async () => {
     const result = await followStreamer(streamerId, !following);
     setFollowing(!following);
     setIsOpen(false);
-    console.log(result);
+    // console.log(result);
   };
 
+  const { mutate, isPending, error } = useMutation({
+    mutationFn: (channelId) => joinCommunity(channelId),
+    onSuccess: (data) => {
+      // console.log(data);
+      queryClient.invalidateQueries({ queryKey: ["community-details"] });
+      navigate(`/community/channel/${streamerDetail.firstChannelId}`);
+    },
+    onError: (err) => {
+      console.error(err.message);
+      alert("Failed to join community");
+    },
+  });
+
   const toggleDropdown = () => setIsOpen(!isOpen);
+
   const handleCommunity = () => {
+    mutate(streamerDetail.communityId);
     setIsOpen(false);
   };
   return (
