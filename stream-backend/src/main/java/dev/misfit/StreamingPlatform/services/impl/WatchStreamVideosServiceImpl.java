@@ -37,23 +37,8 @@ public class WatchStreamVideosServiceImpl implements WatchStreamVideosService {
         SearchUser searchUser = searchUserRepository.findById(user.getUserId())
                 .orElseThrow(() -> new UserNotFoundException("User not found in ES"));
 
-//        Page<Stream> pagedStream = streamRepository.findByStreamer_UserId(streamerId, pageable);
         Page<StreamSearch> pagedStreamInES = searchRepository.findByStreamerId(streamerId, pageable);
-
-//        Page<StreamVideosResponse> streamResponses = pagedStream.map(this::convertToStreamVideoResponse);
         Page<StreamVideosResponse> map = pagedStreamInES.map(this::convertToStreamVideoResponse);
-
-
-//        return StreamerResponse.builder()
-//                .id(user.getUserId())
-////                .email(user.getEmail())
-//                .name(user.getName())
-//                .profilePic(user.getProfilePic())
-////                .likedStreams(user.getLikedStreams().stream().map(likedStream -> likedStream.getId()).collect(Collectors.toSet()))
-//                .followers(user.getFollowers().stream().map(User::getUserId).collect(Collectors.toSet()))
-//                .following(user.getFollowing().stream().map(User::getUserId).collect(Collectors.toSet()))
-//                .streamVideosResponse(streamResponses)
-//                .build();
 
         return StreamerResponse.builder()
                 .id(searchUser.getId())
@@ -62,9 +47,12 @@ public class WatchStreamVideosServiceImpl implements WatchStreamVideosService {
                 .followersCount(searchUser.getFollowersCount())
                 .isFollowing(searchUser.getFollowers().contains(userId))
                 .streamVideosResponse(map)
-                .communityId(user.getOwnedCommunity().getId())
-                .communityName(user.getOwnedCommunity().getCommunityName())
-                .firstChannelId(user.getOwnedCommunity().getChannels().getFirst().getId())
+                .communityId(user.getOwnedCommunity() != null ? user.getOwnedCommunity().getId() : null)
+                .communityName(user.getOwnedCommunity() != null ? user.getOwnedCommunity().getCommunityName(): null)
+                .firstChannelId(user.getOwnedCommunity() != null ? user.getOwnedCommunity().getChannels().getFirst().getId() : null)
+                .communityId(user.getOwnedCommunity() != null ? user.getOwnedCommunity().getId() : null)
+                .communityName(user.getOwnedCommunity() != null ? user.getOwnedCommunity().getCommunityName() : null)
+                .firstChannelId(user.getOwnedCommunity() != null ? user.getOwnedCommunity().getChannels().getFirst().getId() : null)
                 .build();
     }
 

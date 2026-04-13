@@ -30,8 +30,8 @@ export default function StartStream() {
   const { mutate, isPending, error } = useMutation({
     mutationFn: (formData) => startStream(formData),
     onSuccess: (data) => {
-      console.log(data);
-      console.log(data.data);
+      // console.log(data);
+      // console.log(data.data);
       navigate("preview", { state: data.data });
     },
     onError: (err) => {

@@ -27,19 +27,6 @@ const Navbar = ({ open, setOpen }) => {
           navigate={navigate}
         />
         <EndTag name={"Community"} />
-        <div className="px-3">
-          <input
-            type="text"
-            placeholder="Search..."
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter")
-                navigate(`/directory/tag/${category.toLowerCase()}`);
-            }}
-            className="w-full px-3 py-1.5 text-sm rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 mt-3"
-          />
-        </div>
         <CommunitySideBar />
         <EndTag name={"End"} />
         <div className="mb-28"></div>
@@ -65,19 +52,6 @@ const Navbar = ({ open, setOpen }) => {
           navigate={navigate}
         />
         <EndTag name={"Community"} />
-        <div className="px-3">
-          <input
-            type="text"
-            placeholder="Search..."
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter")
-                navigate(`/directory/tag/${category.toLowerCase()}`);
-            }}
-            className="w-full px-3 py-1.5 text-sm rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-2 mt-3"
-          />
-        </div>
         <CommunitySideBar />
         <EndTag name={"End"} />
       </aside>

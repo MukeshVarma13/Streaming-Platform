@@ -1,5 +1,4 @@
 import { createContext, useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { loggedUser } from "../api/auth.api";
 
 export const UserContext = createContext(null);

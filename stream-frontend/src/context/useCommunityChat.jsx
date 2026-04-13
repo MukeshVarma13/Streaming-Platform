@@ -31,11 +31,9 @@ const useCommunityChat = (channelId) => {
         const newMessage = JSON.parse(msg.body);
         queryClient.setQueryData(["community-chat", channelId], (old) => {
           if (!old) return old;
-
           return {
             ...old,
             pages: old.pages.map((page, index) => {
-              // add message to FIRST page (latest messages page)
               if (index === 0) {
                 return {
                   ...page,

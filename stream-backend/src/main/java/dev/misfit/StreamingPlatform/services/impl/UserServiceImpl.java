@@ -6,18 +6,29 @@ import dev.misfit.StreamingPlatform.DTO.RegisterRequest;
 import dev.misfit.StreamingPlatform.customExceptions.UnauthorizedUserException;
 import dev.misfit.StreamingPlatform.customExceptions.UserNotFoundException;
 import dev.misfit.StreamingPlatform.entities.SearchUser;
+import dev.misfit.StreamingPlatform.entities.StreamSearch;
 import dev.misfit.StreamingPlatform.entities.User;
 import dev.misfit.StreamingPlatform.repositories.SearchUserRepository;
+import dev.misfit.StreamingPlatform.repositories.StreamSearchRepository;
 import dev.misfit.StreamingPlatform.repositories.UserRepository;
 import dev.misfit.StreamingPlatform.services.UserService;
 import dev.misfit.StreamingPlatform.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,37 +38,43 @@ public class UserServiceImpl implements UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final AuthenticationManager authenticationManager;
     private final SearchUserRepository searchUserRepository;
+    private final StreamSearchRepository streamSearchRepository;
     private final JwtUtil jwtUtil;
+
     @Value("${profile-picture.path}")
     private String profilePicPath;
 
     public UserServiceImpl(
             UserRepository userRepository,
             BCryptPasswordEncoder bCryptPasswordEncoder,
-            AuthenticationManager authenticationManager, SearchUserRepository searchUserRepository,
+            AuthenticationManager authenticationManager, SearchUserRepository searchUserRepository, StreamSearchRepository streamSearchRepository,
             JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.authenticationManager = authenticationManager;
         this.searchUserRepository = searchUserRepository;
+        this.streamSearchRepository = streamSearchRepository;
         this.jwtUtil = jwtUtil;
     }
 
     @Override
-    public boolean addUser(RegisterRequest registerRequest) {
+    @Transactional
+    public LoginResponse addUser(RegisterRequest registerRequest) {
+
+        Optional<User> userExists = userRepository.findByEmailIgnoreCase(registerRequest.getEmail());
+
+        if (userExists.isPresent()) {
+            throw new UserNotFoundException("User already exists");
+        }
+
+        registerRequest.setEmail(
+                registerRequest.getEmail().trim().toLowerCase()
+        );
+        String password = registerRequest.getPassword();
+
         registerRequest.setPassword(bCryptPasswordEncoder
                 .encode(registerRequest.getPassword()));
         User user = convertToUser(registerRequest);
-
-//        Path uploadDir = Path.of(profilePicPath);
-//        Files.createDirectories(uploadDir);
-
-//        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-//        Path filePath = uploadDir.resolve(fileName);
-//
-//        Files.copy(file.getInputStream(), filePath);
-
-//        user.setProfilePic("/profile-pic/" + fileName);
         User saved = userRepository.save(user);
 
         SearchUser searchUser = SearchUser.builder()
@@ -68,8 +85,8 @@ public class UserServiceImpl implements UserService {
                 .followersCount(saved.getFollowers().size())
                 .build();
         searchUserRepository.save(searchUser);
-        return true;
 
+        return login(new LoginRequest(registerRequest.getEmail(), password));
     }
 
     private User convertToUser(RegisterRequest request) {
@@ -83,9 +100,14 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
+    @Transactional
     public LoginResponse login(LoginRequest loginRequest) {
 
-        User user = userRepository.findByEmail(loginRequest.getEmail())
+        loginRequest.setEmail(
+                loginRequest.getEmail().trim().toLowerCase()
+        );
+
+        User user = userRepository.findByEmailIgnoreCase(loginRequest.getEmail())
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
 //        Path profilePath = Path.of(profilePicPath, user.getProfilePic());
@@ -102,5 +124,32 @@ public class UserServiceImpl implements UserService {
                     .build();
         }
         throw new UnauthorizedUserException("User unauthorized");
+    }
+
+    @Override
+    @CacheEvict(value = "logged-user", key = "#userId", allEntries = true)
+    @Transactional
+    public void completeProfile(Long userId, MultipartFile profile, String newName) throws IOException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        SearchUser searchUser = searchUserRepository.findById(user.getUserId())
+                .orElseThrow(() -> new UserNotFoundException("User not found in Es"));
+
+        Path uploadDir = Path.of(profilePicPath);
+        Files.createDirectories(uploadDir);
+        String fileName = System.currentTimeMillis() + "_" + profile.getOriginalFilename();
+        Path filePath = uploadDir.resolve(fileName);
+        Files.copy(profile.getInputStream(), filePath);
+        if (newName != null) {
+            user.setName(newName);
+            searchUser.setName(newName);
+        }
+
+        user.setProfilePic("/profile-pic/" + fileName);
+        searchUser.setProfilePic(user.getProfilePic());
+
+        userRepository.save(user);
+        searchUserRepository.save(searchUser);
     }
 }

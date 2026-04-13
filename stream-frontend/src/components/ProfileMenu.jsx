@@ -10,6 +10,7 @@ export default function ProfileMenu() {
   const dropdownRef = useRef();
   const toggleDropdown = () => setOpen(!open);
   const [authMenuOpen, setAuthMenuOpen] = useState(false);
+  // console.log(userDetail);
 
   useEffect(() => {
     const handler = (e) => {
@@ -37,11 +38,10 @@ export default function ProfileMenu() {
         </button>
         {authMenuOpen && !userDetail && (
           <div className="absolute right-0 mt-2 w-64 rounded-md shadow-lg bg-white border border-gray-200 z-10 bg-theme p-4 transform animate-slideDown">
-            <h3 className="text-lg font-semibold mb-2 text-white">
-              Welcome 👋
-            </h3>
+            <h3 className="text-lg font-semibold mb-2 text-white">Welcome</h3>
 
             <Link
+              onClick={() => setAuthMenuOpen(false)}
               to="/auth"
               className="block w-full text-center py-2 mb-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition text-black"
             >
@@ -49,6 +49,7 @@ export default function ProfileMenu() {
             </Link>
 
             <Link
+              onClick={() => setAuthMenuOpen(false)}
               to="/auth/sign-up"
               className="block w-full text-center py-2 rounded-lg body-theme text-white hover:bg-indigo-700 transition"
             >
@@ -73,7 +74,7 @@ export default function ProfileMenu() {
         >
           {userDetail?.profilePic ? (
             <img
-              src={baseURL + "/" + userDetail?.profilePic}
+              src={baseURL + userDetail?.profilePic}
               alt=""
               className="h-10 w-10 rounded-full object-cover"
             />
@@ -92,11 +93,15 @@ export default function ProfileMenu() {
               {/* Section 1: Profile & Actions */}
               <div className="mb-3">
                 <div className="flex items-center gap-2 mb-2 cursor-not-allowed">
-                  <img
-                    src={baseURL + userDetail.profilePic}
-                    alt="avatar"
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
+                  {userDetail?.profilePic ? (
+                    <img
+                      src={baseURL + userDetail?.profilePic}
+                      alt=""
+                      className="h-10 w-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <User />
+                  )}
                   <div>
                     <p className="text-sm font-medium text-grade">
                       {userDetail.name}
@@ -104,7 +109,7 @@ export default function ProfileMenu() {
                     <p className="text-xs">{userDetail.email}</p>
                   </div>
                 </div>
-                <NavLink to="/profile">
+                <NavLink to={`/channel/${userDetail?.id}`}>
                   <MenuItem label="Profile" />
                 </NavLink>
                 <NavLink to="/setting">

@@ -1,7 +1,6 @@
 package dev.misfit.StreamingPlatform.services.impl;
 
 import dev.misfit.StreamingPlatform.DTO.ChatResponse;
-import dev.misfit.StreamingPlatform.DTO.PageResponse;
 import dev.misfit.StreamingPlatform.DTO.StreamVideosResponse;
 import dev.misfit.StreamingPlatform.DTO.StreamerResponse;
 import dev.misfit.StreamingPlatform.customExceptions.StreamNotFoundException;
@@ -50,7 +49,7 @@ public class StreamVideosServiceImpl implements StreamVideosService {
         } else {
             user.getLikedStreams().removeIf(s -> s.getId().equals(stream.getId()));
         }
-        int likesCount =stream.getLikes().size();
+        int likesCount = stream.getLikes().size();
         streamInES.setLikesCount(likesCount);
         userRepository.save(user);
         searchRepository.save(streamInES);
@@ -102,11 +101,15 @@ public class StreamVideosServiceImpl implements StreamVideosService {
     @Override
     @Cacheable(value = "logged-user", key = "#userId")
     public StreamerResponse getLoggedUser(Long userId, String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("User Not found"));
+        User user = userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new UserNotFoundException("User Not found in DB"));
+        SearchUser searchUser = searchUserRepository.findById(user.getUserId())
+                .orElseThrow(() -> new UserNotFoundException("User Not found in ES"));
+
         if (!user.getUserId().equals(userId)) {
             throw new UserNotFoundException("User mismatch");
         }
+
         return convertToStreamUserResponse(user);
     }
 
@@ -149,6 +152,9 @@ public class StreamVideosServiceImpl implements StreamVideosService {
                 .profilePic(user.getProfilePic())
                 .followersCount(user.getFollowers().size())
 //                .following(user.getFollowing().stream().map(following -> following.getUserId()).collect(Collectors.toSet()))
+                .communityId(user.getOwnedCommunity() != null ? user.getOwnedCommunity().getId() : null)
+                .communityName(user.getOwnedCommunity() != null ? user.getOwnedCommunity().getCommunityName() : null)
+                .firstChannelId(user.getOwnedCommunity() != null ? user.getOwnedCommunity().getChannels().getFirst().getId() : null)
                 .build();
     }
 }

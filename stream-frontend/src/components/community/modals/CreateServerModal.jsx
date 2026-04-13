@@ -23,8 +23,7 @@ const CreateServerModal = ({
       queryClient.invalidateQueries({ queryKey: ["community-details"] });
     },
     onError: (err) => {
-      console.error(err);
-      alert("Failed to create community");
+      alert(err?.response?.data);
     },
   });
 

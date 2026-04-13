@@ -1,10 +1,14 @@
 package dev.misfit.StreamingPlatform.services;
 
+import dev.misfit.StreamingPlatform.customExceptions.UserNotFoundException;
+import dev.misfit.StreamingPlatform.entities.User;
+import dev.misfit.StreamingPlatform.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -14,14 +18,20 @@ public class OTPService {
     private final JavaMailSender mailSender;
     private final ConcurrentHashMap<String, String> otpStore = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Long> otpExpiry = new ConcurrentHashMap<>();
+    private final UserRepository userRepository;
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    public OTPService(JavaMailSender mailSender) {
+    public OTPService(JavaMailSender mailSender, UserRepository userRepository) {
         this.mailSender = mailSender;
+        this.userRepository = userRepository;
     }
 
     public String generateOtp(String email) {
+        Optional<User> userExists = userRepository.findByEmailIgnoreCase(email);
+        if (userExists.isPresent()) {
+            throw new UserNotFoundException("User Exists with the email");
+        }
         String otp = String.valueOf(100000 + new Random().nextInt(900000)); // 6-digit OTP
         otpStore.put(email, otp);
         otpExpiry.put(email, System.currentTimeMillis() + 5 * 60 * 1000); // 5 min expiry

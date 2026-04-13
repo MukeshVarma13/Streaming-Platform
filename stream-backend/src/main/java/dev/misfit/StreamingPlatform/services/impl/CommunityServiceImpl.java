@@ -46,6 +46,10 @@ public class CommunityServiceImpl implements CommunityService {
         User owner = userRepository.findById(creatorId)
                 .orElseThrow(() -> new UserNotFoundException("User Not found to create community"));
 
+        if (owner.getOwnedCommunity() != null) {
+            throw new CommunityNotFoundException("User can only create one community");
+        }
+
         Channels general = defaultChannel(ChannelType.TEXT, "general");
         Channels lobby = defaultChannel(ChannelType.VIDEO, "lobby");
 
@@ -158,10 +162,10 @@ public class CommunityServiceImpl implements CommunityService {
 
         Channels savedChannel = channelRepository.save(
                 Channels.builder()
-                .channelName(request.getChannelName())
-                .community(ownedCommunity)
-                .type(request.getType())
-                .build()
+                        .channelName(request.getChannelName())
+                        .community(ownedCommunity)
+                        .type(request.getType())
+                        .build()
         );
 
         ownedCommunity.getChannels().add(savedChannel);

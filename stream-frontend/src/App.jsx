@@ -5,9 +5,7 @@ import ErrorPage from "./pages/ErrorPage";
 import Search from "./pages/Search";
 import Channel from "./pages/Channel";
 import Dashboard from "./pages/Dashboard";
-import EditProfile from "./pages/EditProfile";
 import Library from "./pages/Library";
-import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Directory from "./pages/Directory";
 import WatchStream from "./pages/WatchStream";
@@ -35,6 +33,8 @@ import CreateChannelModal from "./components/community/modals/CreateChannelModal
 import VoicePanel from "./components/community/modals/VoicePanel";
 import { UserContext } from "./context/UserDetailsContext";
 import JoinServer from "./components/JoinServer";
+import CompleteProfile from "./pages/CompleteProfile";
+import EditProfile from "./components/EditProfile";
 
 const App = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -42,7 +42,6 @@ const App = () => {
   const [isInVoice, setIsInVoice] = useState(false);
   const [serverNameInput, setServerNameInput] = useState("");
   const [selectedTemplate, setSelectedTemplate] = useState("gaming");
-  const [channelNameInput, setChannelNameInput] = useState("");
   const {
     showCreateChannelModal,
     setShowCreateChannelModal,
@@ -51,7 +50,6 @@ const App = () => {
     showCreateServerModal,
     setShowCreateServerModal,
     invite,
-    setInvite,
   } = useContext(UserContext);
 
   return (
@@ -115,7 +113,6 @@ const App = () => {
             <Route path="preview" element={<StreamPreview />} /> {/*Done*/}
             <Route path="dashboard" element={<Dashboard />} /> {/*Done*/}
           </Route>
-          <Route path="/profile" element={<Profile />} /> {/*Not Done*/}
           <Route path="/setting" element={<Settings />} /> {/*Not Done*/}
           <Route path="/stream/:streamId" element={<WatchStream />} />
           {/*Done*/}
@@ -125,14 +122,14 @@ const App = () => {
             <Route path="all" element={<CategoryVideos />} /> {/*Not Done*/}
           </Route>
           {/*Need to add videos*/}
+          <Route path="/edit-profile" element={<EditProfile />} />
           <Route path="/auth" element={<AuthPage />}>
             <Route index element={<Login />} />
             <Route path="sign-up" element={<Register />} />
             <Route path="verify-otp" element={<OtpVerify />} />
           </Route>
+          <Route path="/auth/complete-profile" element={<CompleteProfile />} />
           {/*Done*/}
-          <Route path="/edit-profile" element={<EditProfile />} />
-          {/*Not Done*/}
           <Route path="/library" element={<Library />} /> {/*Not Done*/}
           <Route path="*" element={<ErrorPage />} /> {/*Done*/}
         </Routes>

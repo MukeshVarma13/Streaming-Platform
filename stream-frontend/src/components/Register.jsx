@@ -6,28 +6,43 @@ import { sendOtp } from "../api/auth.api";
 const Register = () => {
   const [showPassword, setShowPassword] = useState(true);
   const navigate = useNavigate();
+
   const [newUser, setNewUser] = useState({
     name: "",
     email: "",
     password: "",
   });
 
-  const handleSignupSubmit = async (e) => { 
-    e.preventDefault();
-    localStorage.setItem("pendingUser", JSON.stringify(newUser));
-    const response = await sendOtp(newUser.email);
+  const [isLoading, setIsLoading] = useState(false);
 
-    if (newUser.email.trim()) {
+  const handleSignupSubmit = async (e) => {
+    e.preventDefault();
+    if (!newUser.email.trim()) return;
+    setIsLoading(true);
+    try {
+      localStorage.setItem("pendingUser", JSON.stringify(newUser));
+      await sendOtp(newUser.email);
       navigate(
-        `/auth/verify-otp?email=${encodeURIComponent(newUser.email.trim())}`
+        `/auth/verify-otp?email=${encodeURIComponent(newUser.email.trim())}`,
       );
+    } catch (error) {
+      if (
+        error.response.status === 404 ||
+        error.response.data === "User Exists with the email"
+      ) {
+        alert(error.response.data);
+        return;
+      }
+      console.error("Failed to send OTP:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const onChangeHandler = (e) => {
     const name = e.target.name;
     const value = e.target.value;
-    setNewUser((newUser) => ({ ...newUser, [name]: value }));
+    setNewUser((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -36,6 +51,7 @@ const Register = () => {
         SIGN UP
       </h2>
       <p className="text-gray-400 mb-8 text-center">Create your new account!</p>
+
       <form onSubmit={handleSignupSubmit} className="flex flex-col gap-5">
         <input
           type="text"
@@ -57,7 +73,7 @@ const Register = () => {
         />
         <div className="relative w-full">
           <input
-            type={`${showPassword ? "password" : "text"}`}
+            type={showPassword ? "password" : "text"}
             placeholder="Password"
             name="password"
             value={newUser.password}
@@ -66,22 +82,30 @@ const Register = () => {
             required
           />
           <span
-            onClick={() => {
-              setShowPassword(!showPassword);
-            }}
+            onClick={() => setShowPassword(!showPassword)}
             className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 bg-gray-600 rounded-sm cursor-pointer flex items-center justify-center text-white text-xs"
           >
             •••
           </span>
         </div>
-        {/* I removed "Confirm Password" for brevity, add it back if needed */}
+
         <button
           type="submit"
-          className="body-theme border border-gray-500 text-gray-400 rounded-md py-3 w-full text-base font-semibold transition-all duration-300 hover:border-white hover:text-white mt-5"
+          disabled={isLoading}
+          className="body-theme border border-gray-500 text-gray-400 rounded-md py-3 w-full text-base font-semibold transition-all duration-300 hover:border-white hover:text-white mt-5 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
         >
-          SEND OTP
+          {isLoading ? (
+            <>
+              {/* Simple Tailwind spinner */}
+              <span className="animate-spin inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-3"></span>
+              SENDING OTP...
+            </>
+          ) : (
+            "SEND OTP"
+          )}
         </button>
       </form>
+
       <>
         <div className="flex justify-center gap-6 my-8 text-gray-500 text-2xl">
           <a href="#" className="hover:text-white transition-colors">
@@ -98,9 +122,7 @@ const Register = () => {
         <p className="text-gray-400 text-center">
           Already have an account?
           <span
-            onClick={() => {
-              navigate("/auth");
-            }}
+            onClick={() => navigate("/auth")}
             className="text-grade cursor-pointer font-bold hover:underline ml-1"
           >
             Sign In

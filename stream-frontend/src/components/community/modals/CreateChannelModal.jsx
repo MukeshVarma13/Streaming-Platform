@@ -25,7 +25,7 @@ const CreateChannelModal = ({
     },
     onError: (err) => {
       console.error(err);
-      alert("Failed to create channel");
+      alert(err?.response?.data);
     },
   });
 

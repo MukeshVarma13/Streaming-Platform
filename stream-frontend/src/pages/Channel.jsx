@@ -4,9 +4,13 @@ import { streamURL } from "../api/axios";
 import ChannelUserDetail from "../components/ChannelUserDetail";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { getstreamerDetails } from "../api/streams.api";
+import { useContext, useEffect, useState } from "react";
+import { UserContext } from "../context/UserDetailsContext";
 
 const Channel = () => {
   const { id } = useParams();
+  const { userDetail } = useContext(UserContext);
+  const [owner, setOwner] = useState(false);
   const {
     data,
     fetchNextPage,
@@ -28,11 +32,21 @@ const Channel = () => {
 
   const streamerDetails = data?.pages?.[0];
   const latestStream = data?.pages?.[0].streamVideosResponse?.content?.[0];
+
+  useEffect(() => {
+    if (userDetail?.id === streamerDetails?.id) {
+      setOwner(true);
+    } else {
+      setOwner(false);
+    }
+  }, [streamerDetails, userDetail]);
+
   // console.log(data);
 
   if (isLoading) {
     return <p>Loading....</p>;
   }
+
   return (
     <div className="w-full relative pr-4">
       {latestStream?.status == "LIVE" ? (
@@ -52,6 +66,9 @@ const Channel = () => {
         <ChannelUserDetail
           streamerDetails={streamerDetails}
           latestStreamVideo={latestStream}
+          owner={owner}
+          setOwner={setOwner}
+          userDetail={userDetail}
         />
         <div className="w-full mb-3">
           <ul className="flex gap-8 text-xl mb-7">
@@ -72,6 +89,9 @@ const Channel = () => {
               isFetchingNextPage,
               fetchNextPage,
               hasNextPage,
+              streamerDetails,
+              owner,
+              setOwner,
             }}
           />
         </div>

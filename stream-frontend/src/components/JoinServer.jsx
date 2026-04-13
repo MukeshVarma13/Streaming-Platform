@@ -55,7 +55,7 @@ const JoinServer = () => {
           type="text"
           value={inviteLink}
           onChange={(e) => setInviteLink(e.target.value)}
-          placeholder="https://discord.gg/h7K9X2m"
+          placeholder="http://localhost:5173/234"
           className="w-full hover-theme text-[#DBDEE1] p-3 rounded-[3px] outline-none focus:ring-0 mb-4 transition-all selection:bg-[#35373C]"
           required
         />

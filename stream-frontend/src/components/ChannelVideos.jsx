@@ -1,11 +1,17 @@
 import { useNavigate, useOutletContext } from "react-router";
 import { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
-import { baseURL } from "../api/axios";
+import ChannelVideosCart from "./ChannelVideosCart";
 
 const ChannelVideos = () => {
-  const { data, isFetchingNextPage, fetchNextPage, hasNextPage } =
-    useOutletContext();
+  const {
+    data,
+    isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+    owner,
+    setOwner,
+  } = useOutletContext();
   const navigate = useNavigate();
   const { ref, inView } = useInView();
 
@@ -29,52 +35,7 @@ const ChannelVideos = () => {
           {allVideos?.map((videos, index) => {
             return (
               <div key={index}>
-                <div
-                  className="aspect-video rounded"
-                  onClick={() => {
-                    navigate(`/stream/${videos.id}`);
-                  }}
-                >
-                  <img
-                    src={baseURL + videos.thumbnail}
-                    alt=""
-                    className="h-full w-full aspect-video bg-theme rounded"
-                  />
-                </div>
-                <div className="py-1 flex flex-col pl-0.5 capitalize">
-                  <p
-                    className="text-xl"
-                    onClick={() => {
-                      navigate(`/stream/${videos.id}`);
-                    }}
-                  >
-                    {videos.title}
-                  </p>
-                  {/* <span className="text-xs">{videos.likes.length} Likes</span> */}
-                  <div className="flex gap-2 items-center flex-wrap text-sm">
-                    <h2
-                      className="text-grade capitalize cursor-pointer"
-                      onClick={() => {
-                        navigate(`/directory/${videos.categories}`);
-                      }}
-                    >
-                      {videos.categories}
-                    </h2>
-                    {videos.tags.map((tag, index) => {
-                      return (
-                        <span
-                          className="bg-[#29292E] rounded-2xl px-2 capitalize text-center cursor-pointer"
-                          key={index}
-                          onClick={() => {
-                            navigate(`/directory/tag/${tag}`);
-                          }}
-                        >
-                          {tag}
-                        </span>
-                      );
-                    })}
-                  </div>
-                </div>
+                <ChannelVideosCart videos={videos} owner={owner} />
               </div>
             );
           })}

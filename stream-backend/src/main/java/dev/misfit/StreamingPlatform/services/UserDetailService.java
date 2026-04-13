@@ -19,7 +19,7 @@ public class UserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        dev.misfit.StreamingPlatform.entities.User user = userRepository.findByEmail(email)
+        dev.misfit.StreamingPlatform.entities.User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new UsernameNotFoundException("user not found"));
         return new User(user.getEmail(), user.getPassword(), Collections.emptyList());
     }

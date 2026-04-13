@@ -18,10 +18,13 @@ const OtpVerify = () => {
       return;
     }
     const response = await register(user);
-    if (response) {
+    // console.log(response.data.token);
+    if (response.status === 200) {
       localStorage.removeItem("pendingUser");
+      localStorage.setItem("token", "Bearer " + response.data.token);
       alert("Register Successfully!")
-      navigate("/auth");
+      navigate("/auth/complete-profile");
+      // navigate("/auth");
     }
   };
 

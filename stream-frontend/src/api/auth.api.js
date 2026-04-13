@@ -23,3 +23,11 @@ export const verifyOtp = (email, otp) => {
 export const loggedUser = () => {
   return http.get(`/api/v1/videos/me`);
 };
+
+export const completeProfile = (formData) => {
+  return http.post("/complete-profile", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};

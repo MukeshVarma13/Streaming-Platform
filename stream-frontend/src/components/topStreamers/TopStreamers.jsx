@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import TopStreamerCard from "./TopStreamerCard";
 import { GrFormNextLink, GrFormPreviousLink } from "react-icons/gr";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { topStreamers } from "../../api/streams.api";
 
 const TopStreamers = ({ title }) => {

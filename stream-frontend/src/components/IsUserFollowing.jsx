@@ -74,13 +74,15 @@ const IsUserFollowing = ({ streamerDetail, isfollowing }) => {
                 <RiDislikeLine size={20} />
                 Unfollow
               </li>
-              <li
-                onClick={() => handleCommunity()}
-                className="px-2 py-2 cursor-pointer transition-colors hover:bg-gray-700 flex gap-2 items-center"
-              >
-                <LiaUserFriendsSolid size={22} className="shrink-0" />
-                Community
-              </li>
+              {streamerDetail.communityId && (
+                <li
+                  onClick={() => handleCommunity()}
+                  className="px-2 py-2 cursor-pointer transition-colors hover:bg-gray-700 flex gap-2 items-center"
+                >
+                  <LiaUserFriendsSolid size={22} className="shrink-0" />
+                  Community
+                </li>
+              )}
             </ul>
           )}
         </div>

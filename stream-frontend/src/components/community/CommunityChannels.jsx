@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { NavLink } from "react-router";
 import { UserContext } from "../../context/UserDetailsContext";
 
@@ -8,22 +8,33 @@ const CommunityChannels = ({
   setCurrentChannelId,
 }) => {
   const [openChannel, setOpenChannel] = useState(false);
-  const { setShowCreateChannelModal, setChannelType } = useContext(UserContext);
+  const { setShowCreateChannelModal, setChannelType, userDetail } =
+    useContext(UserContext);
+  const [communityOwner, setCommunityOwner] = useState(false);
+
+  useEffect(() => {
+    if (community?.owner.id === userDetail?.id) {
+      setCommunityOwner(true);
+    }
+  }, [userDetail, community]);
 
   return (
     <div className="w-full flex flex-col">
-      {/* Server Header - Enhanced */}
       <div
         onClick={() => setOpenChannel(!openChannel)}
         className="h-12 bg-[#2f3136] hover:bg-[#393c43] border-b border-[#202225] flex items-center px-3 font-semibold cursor-pointer transition-colors group"
       >
         <div className="flex-1 truncate flex items-center gap-2">
-          {/* Optional server icon (you can replace with real icon later) */}
           <div className="w-6 h-6 bg-[#5865f2] rounded-md flex items-center justify-center text-xs font-bold shrink-0">
             {community?.communityName?.[0] || "C"}
           </div>
-          <span className="text-white truncate text-sm">
-            {community ? community?.communityName : "Select a server"}
+          <span className="text-white truncate text-sm flex flex-col">
+            <span>
+              {community ? community?.communityName : "Select a server"}
+            </span>
+            {communityOwner && (
+              <span className="text-[11px] text-grade">Admin</span>
+            )}
           </span>
         </div>
 
@@ -34,24 +45,23 @@ const CommunityChannels = ({
         />
       </div>
 
-      {/* Channels Content */}
       {openChannel && (
         <div className="flex-1 overflow-y-auto py-2">
-          {/* TEXT CHANNELS SECTION */}
           <div className="px-2">
             <div className="px-2 text-xs font-semibold uppercase tracking-widest flex items-center justify-between text-[#949ba4] mb-1">
               <div className="flex items-center gap-1">TEXT CHANNELS</div>
-              <i
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setChannelType("TEXT");
-                  setShowCreateChannelModal(true);
-                }}
-                className="fa-solid fa-plus text-base cursor-pointer hover:text-[#f04747] hover:scale-110 transition-all"
-              />
+              {communityOwner && (
+                <i
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setChannelType("TEXT");
+                    setShowCreateChannelModal(true);
+                  }}
+                  className="fa-solid fa-plus text-base cursor-pointer hover:text-[#f04747] hover:scale-110 transition-all"
+                />
+              )}
             </div>
 
-            {/* Text Channels List */}
             <div className="space-y-0.5">
               {community?.channels
                 .filter((c) => c.type === "TEXT")
@@ -80,21 +90,21 @@ const CommunityChannels = ({
             </div>
           </div>
 
-          {/* VOICE CHANNELS SECTION */}
           <div className="px-2 mt-3">
             <div className="px-2 text-xs font-semibold uppercase tracking-widest flex items-center justify-between text-[#949ba4] mb-1">
               <div className="flex items-center gap-1">VOICE CHANNELS</div>
-              <i
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setChannelType("VIDEO");
-                  setShowCreateChannelModal(true);
-                }}
-                className="fa-solid fa-plus text-base cursor-pointer hover:text-[#f04747] hover:scale-110 transition-all"
-              />
+              {communityOwner && (
+                <i
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setChannelType("VIDEO");
+                    setShowCreateChannelModal(true);
+                  }}
+                  className="fa-solid fa-plus text-base cursor-pointer hover:text-[#f04747] hover:scale-110 transition-all"
+                />
+              )}
             </div>
 
-            {/* Voice Channels List */}
             <div className="space-y-0.5">
               {community?.channels
                 .filter((c) => c.type === "VIDEO")

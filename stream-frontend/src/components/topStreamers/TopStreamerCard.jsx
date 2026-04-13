@@ -19,9 +19,8 @@ const TopStreamerCard = ({ streamer }) => {
   return (
     <>
       {/* 1. THE HIGHLIGHT OVERLAY (Portaled-style logic) */}
-      {show && (
+      {false && (
         <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/90 backdrop-blur-sm">
-          {/* Close button - strictly above the highlight */}
           <button 
             onClick={(e) => {
               e.stopPropagation(); // Prevents re-triggering showHighlight

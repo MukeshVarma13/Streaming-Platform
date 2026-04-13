@@ -1,10 +1,10 @@
-import WelcomeScreen from "./modals/WelcomeScreen";
 import ChannelWelcomeHeader from "./modals/ChannelWelcomeHeader";
 import VoiceChannelStage from "./VoiceChannelStage";
 import { channelDetail } from "../../api/community";
 import { useQuery } from "@tanstack/react-query";
 import useCommunityChat from "../../context/useCommunityChat";
 import { Loader } from "lucide-react";
+import { baseURL } from "../../api/axios";
 
 const CommunityChat = ({ channelId, openMembers, setOpenMembers }) => {
   // const { channelId } = useParams();
@@ -68,7 +68,10 @@ const CommunityChat = ({ channelId, openMembers, setOpenMembers }) => {
         </div>
       </div>
 
-      <div ref={chatBoxRef} className="overflow-y-scroll no-scrollbar w-full h-full">
+      <div
+        ref={chatBoxRef}
+        className="overflow-y-scroll no-scrollbar w-full h-full"
+      >
         <div className="h-full">
           <div className="h-full flex">
             <ChannelWelcomeHeader channelName={currentChannel.channelName} />
@@ -90,13 +93,22 @@ const CommunityChat = ({ channelId, openMembers, setOpenMembers }) => {
                     </div>
                   )}
                   {currentMessagesList?.map((msg) => (
-                    <div key={msg.id} className="message flex gap-4 group">
-                      <div
-                        className="w-10 h-10 rounded-full shrink-0 flex items-center justify-center text-white text-xl"
-                        style={{ backgroundColor: "#faa61a" }}
-                      >
-                        {msg.userName[0]}
-                      </div>
+                    <div key={msg.id} className="message flex gap-2 group">
+                      {msg.userProfile ? (
+                        <div className="w-10 h-10 rounded-full shrink-0 flex items-center justify-center text-white text-xl">
+                          <img
+                            src={baseURL + msg.userProfile}
+                            className="w-full h-full"
+                          />
+                        </div>
+                      ) : (
+                        <div
+                          className="w-10 h-10 rounded-full shrink-0 flex items-center justify-center text-white text-xl"
+                          style={{ backgroundColor: "#faa61a" }}
+                        >
+                          {msg.userName[0]}
+                        </div>
+                      )}
                       <div className="flex-1">
                         <div className="flex items-baseline gap-2">
                           <span className="font-semibold cursor-pointer">
@@ -106,7 +118,7 @@ const CommunityChat = ({ channelId, openMembers, setOpenMembers }) => {
                             {msg.time}
                           </span>
                         </div>
-                        <div className="text-[#dcddde] leading-relaxed">
+                        <div className="text-[#dcddde] leading-relaxed mr-2 w-fit bg-white/10 py-1 px-2 rounded-r-xl rounded-b-xl wrap-anywhere text-sm">
                           {msg.content.content}
                         </div>
                       </div>

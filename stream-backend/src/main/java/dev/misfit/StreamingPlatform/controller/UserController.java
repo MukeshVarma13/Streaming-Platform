@@ -7,7 +7,12 @@ import dev.misfit.StreamingPlatform.DTO.RegisterRequest;
 import dev.misfit.StreamingPlatform.services.OTPService;
 import dev.misfit.StreamingPlatform.services.TempVerificationService;
 import dev.misfit.StreamingPlatform.services.UserService;
+import dev.misfit.StreamingPlatform.utils.JwtUserPrincipal;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/")
@@ -25,9 +30,9 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public boolean register(@RequestBody RegisterRequest registerRequest) {
+    public LoginResponse register(@RequestBody RegisterRequest registerRequest) {
         if (!verificationService.isEmailVerified(registerRequest.getEmail())) {
-            return false;
+            return null;
         }
         verificationService.remove(registerRequest.getEmail());
         return service.addUser(registerRequest);
@@ -36,6 +41,19 @@ public class UserController {
     @PostMapping("/login")
     public LoginResponse login(@RequestBody LoginRequest request) {
         return service.login(request);
+    }
+
+    @PostMapping("/complete-profile")
+    public void completeProfile(
+            @RequestParam("profile") MultipartFile profile,
+            @RequestParam(value = "name" ,required = false) String newName,
+            @AuthenticationPrincipal JwtUserPrincipal user
+    ) throws IOException {
+        Long userId = user.getClaims().get("userId", Long.class);
+        if (profile == null) {
+            return;
+        }
+        service.completeProfile(userId, profile, newName);
     }
 
     // STEP 1: Send OTP

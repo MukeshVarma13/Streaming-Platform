@@ -4,9 +4,9 @@ const VoicePanel = ({ showVoicePanel, currentChannel, leaveVoice }) => {
   // if (!showVoicePanel) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 bg-[#292b2f] rounded-2xl shadow-2xl w-80 border border-[#5865f2] overflow-hidden animate-in slide-in-from-bottom-4 duration-300 z-10">
+    <div className="fixed bottom-6 right-6 bg-[#292b2f] rounded-2xl shadow-2xl w-80 overflow-hidden animate-in slide-in-from-bottom-4 duration-300 z-10">
       {/* Header */}
-      <div className="px-4 py-3 bg-[#5865f2] text-white flex items-center justify-between text-sm font-semibold">
+      <div className="px-4 py-3 body-theme text-white flex items-center justify-between text-sm font-semibold">
         <div className="flex items-center gap-2">
           <span>🔊</span>
           <span>Voice Connected</span>
@@ -21,7 +21,7 @@ const VoicePanel = ({ showVoicePanel, currentChannel, leaveVoice }) => {
       <div className="p-4 space-y-3">
         <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider text-[#b9bbbe]">
           <div>In channel</div>
-          <div className="text-[#5865f2]">
+          <div className="text-grade">
             {currentChannel ? currentChannel.name : "Unknown"}
           </div>
         </div>
@@ -50,7 +50,7 @@ const VoicePanel = ({ showVoicePanel, currentChannel, leaveVoice }) => {
       </div>
 
       {/* Subtle Bottom Glow */}
-      <div className="h-1 bg-gradient-to-r from-transparent via-[#5865f2] to-transparent opacity-30" />
+      <div className="h-1 bg-linear-to-r from-transparent via-[#5865f2] to-transparent opacity-30" />
     </div>
   );
 };
