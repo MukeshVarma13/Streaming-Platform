@@ -53,7 +53,7 @@ export const searchByUserName = (term) => {
 // Get streamer details for the channel page
 export const getstreamerDetails = async (streamerId, pageParam = 0) => {
   const res = await http.get(
-    `api/v1/videos/streamer-detail/${streamerId}?page=${pageParam}&size=10`
+    `api/v1/videos/streamer-detail/${streamerId}?page=${pageParam}&size=10`,
   );
   return res.data;
 };
@@ -61,7 +61,7 @@ export const getstreamerDetails = async (streamerId, pageParam = 0) => {
 // Get streams by category
 export const getByCategories = (term, pageParam = 0) => {
   return http.get(
-    `api/v1/search/category?term=${term}&page=${pageParam}&size=15`
+    `api/v1/search/category?term=${term}&page=${pageParam}&size=15`,
   );
 };
 
@@ -99,4 +99,12 @@ export const streamComplete = (streamKey) => {
 // Get all the top streamers
 export const topStreamers = (pageParam = 0) => {
   return http.get(`/api/v1/search/top-streamers?page=${pageParam}&size=15`);
+};
+
+export const getFollowerList = () => {
+  return http.get(`/api/v1/streamer/followers-list`);
+};
+
+export const getFollowingList = () => {
+  return http.get(`/api/v1/streamer/following-list`);
 };

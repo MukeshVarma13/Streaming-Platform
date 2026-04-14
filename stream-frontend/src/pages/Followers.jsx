@@ -1,6 +1,5 @@
 import { useContext } from "react";
-import Highlight from "./Highlight";
-import { getFollowingList } from "../api/streams.api";
+import { getFollowerList } from "../api/streams.api";
 import { UserContext } from "../context/UserDetailsContext";
 import { useQuery } from "@tanstack/react-query";
 import { List, User } from "lucide-react";
@@ -8,12 +7,12 @@ import { baseURL } from "../api/axios";
 import { NavLink } from "react-router";
 import { MdArrowOutward } from "react-icons/md";
 
-const Following = () => {
+const Followers = () => {
   const { userDetail } = useContext(UserContext);
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["following-list", userDetail],
-    queryFn: () => getFollowingList().then((res) => res.data),
+    queryKey: ["followers-list", userDetail],
+    queryFn: () => getFollowerList().then((res) => res.data),
   });
 
   if (isLoading) {
@@ -25,14 +24,18 @@ const Following = () => {
       <div className="h-full w-full">
         {data?.length < 0 ? (
           <div className="w-full h-full text-3xl text-center py-4">
-            Not following any streamer. Please follow any!
+            No followers!
           </div>
         ) : (
           <div className="w-full h-full px-14">
             <span className="text-4xl flex items-center gap-2 py-2">
-              <List size={34} className="text-grade" /> List of Streamers
+              <List size={34} className="text-grade" />
+              Followers
             </span>
             <hr className="opacity-30 py-2" />
+            <div className="mb-2">
+              {data?.length} <span className="">Followers</span>
+            </div>
             <div className="w-full flex gap-3 flex-wrap">
               {data?.map((channel, index) => (
                 <div
@@ -73,4 +76,4 @@ const Following = () => {
   );
 };
 
-export default Following;
+export default Followers;

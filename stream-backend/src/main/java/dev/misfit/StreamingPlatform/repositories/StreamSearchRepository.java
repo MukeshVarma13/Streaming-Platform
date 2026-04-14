@@ -8,8 +8,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface StreamSearchRepository extends ElasticsearchRepository<StreamSearch, Long> {
     Page<StreamSearch> findByStatus(StreamStatus streamStatus, Pageable pageable);
     Page<StreamSearch> findByStreamerId(Long userId, Pageable pageable);
+    Optional<StreamSearch> findByStreamerId(Long userId);
 }

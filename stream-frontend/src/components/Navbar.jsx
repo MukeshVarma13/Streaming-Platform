@@ -129,9 +129,9 @@ const NavItems = ({ category, setCategory, catOpen, setCatOpen, navigate }) => {
         <span>Following</span>
       </NavLink>
 
-      <NavLink to="/friends" className="nav-item">
+      <NavLink to="/followers" className="nav-item">
         <LiaUserFriendsSolid size={22} />
-        <span>Friends</span>
+        <span>Followers</span>
       </NavLink>
     </div>
   );

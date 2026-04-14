@@ -1,5 +1,6 @@
 package dev.misfit.StreamingPlatform.config;
 
+import dev.misfit.StreamingPlatform.customExceptions.UnauthorizedUserException;
 import dev.misfit.StreamingPlatform.filters.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -61,6 +62,12 @@ public class WebSecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
+                .exceptionHandling(ex -> ex.authenticationEntryPoint((request, response, authException) -> {
+                    response.setStatus(401);
+                    response.setContentType("application/json");
+                    String message = authException.getMessage();
+                    response.getWriter().write(String.valueOf(new UnauthorizedUserException(message)));
+                }))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

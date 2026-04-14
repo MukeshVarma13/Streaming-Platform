@@ -8,7 +8,6 @@ import SearchVideosContainer from "../components/SearchVideosContainer";
 import { GoArrowUpLeft } from "react-icons/go";
 import SearchChannels from "../components/SearchChannels";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
 
 const Search = () => {
   const [searchParam] = useSearchParams();
@@ -66,7 +65,7 @@ const Search = () => {
         </h2>
         <hr className="opacity-40 mt-1" />
       </div>
-      {channelUser.content.length > 0 && (
+      {channelUser?.content?.length > 0 && (
         <div className="w-full mt-2">
           <p className="my-1 text-2xl text-grade">Channels</p>
           <div className="flex flex-col">

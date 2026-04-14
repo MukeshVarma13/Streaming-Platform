@@ -33,7 +33,7 @@ const VideoList = ({
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         {allStream?.length > 0 ? (
-          allStream?.map((stream, index) => {
+          allStream?.map((stream) => {
             return <VideoCard key={stream.id} stream={stream} />;
           })
         ) : (
@@ -41,8 +41,7 @@ const VideoList = ({
         )}
       </div>
       <div>
-        {/* Change this for the number of videos u want to see at the start */}
-        {allStream?.length > 4 && showMore && (
+        {showMore && hasNextPage && (
           <span
             onClick={handleShowmore}
             className="text-[12px] opacity-60 flex items-center gap-2 text-nowrap cursor-pointer"

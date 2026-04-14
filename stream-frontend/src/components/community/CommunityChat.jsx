@@ -45,9 +45,9 @@ const CommunityChat = ({ channelId, openMembers, setOpenMembers }) => {
   }
 
   return (
-    <div className="flex flex-col bg-[#36393e] h-full w-full">
+    <div className="flex flex-col bg-theme h-full w-full">
       {/* Top Bar */}
-      <div className="h-12 border-b border-[#202225] flex items-center px-4 shadow-sm">
+      <div className="h-12 border-b border-[#474c53] flex items-center px-4 shadow-sm">
         {currentChannel?.type === "TEXT" ? (
           <i className="fa-solid fa-hashtag text-[#949ba4] mr-2" />
         ) : (
@@ -78,9 +78,7 @@ const CommunityChat = ({ channelId, openMembers, setOpenMembers }) => {
           </div>
           {currentMessagesList?.length > 0 ? (
             <div className="space-y-6 h-full">
-              {/* Content Area */}
               {currentChannel?.type === "TEXT" ? (
-                /* Chat Mode */
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
                   {hasNextPage && (
                     <div
@@ -98,7 +96,7 @@ const CommunityChat = ({ channelId, openMembers, setOpenMembers }) => {
                         <div className="w-10 h-10 rounded-full shrink-0 flex items-center justify-center text-white text-xl">
                           <img
                             src={baseURL + msg.userProfile}
-                            className="w-full h-full"
+                            className="w-full h-full rounded-full"
                           />
                         </div>
                       ) : (
@@ -169,8 +167,6 @@ const CommunityChat = ({ channelId, openMembers, setOpenMembers }) => {
           )}
         </div>
       </div>
-
-      {/* Message Input (Only visible in text channels) */}
       {currentChannel?.type === "TEXT" && (
         <form
           onSubmit={(e) => {

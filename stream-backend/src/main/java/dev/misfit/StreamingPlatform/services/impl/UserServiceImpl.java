@@ -3,6 +3,7 @@ package dev.misfit.StreamingPlatform.services.impl;
 import dev.misfit.StreamingPlatform.DTO.LoginRequest;
 import dev.misfit.StreamingPlatform.DTO.LoginResponse;
 import dev.misfit.StreamingPlatform.DTO.RegisterRequest;
+import dev.misfit.StreamingPlatform.customExceptions.StreamNotFoundException;
 import dev.misfit.StreamingPlatform.customExceptions.UnauthorizedUserException;
 import dev.misfit.StreamingPlatform.customExceptions.UserNotFoundException;
 import dev.misfit.StreamingPlatform.entities.SearchUser;
@@ -136,6 +137,8 @@ public class UserServiceImpl implements UserService {
         SearchUser searchUser = searchUserRepository.findById(user.getUserId())
                 .orElseThrow(() -> new UserNotFoundException("User not found in Es"));
 
+        Optional<StreamSearch> streamUser = streamSearchRepository.findByStreamerId(user.getUserId());
+
         Path uploadDir = Path.of(profilePicPath);
         Files.createDirectories(uploadDir);
         String fileName = System.currentTimeMillis() + "_" + profile.getOriginalFilename();
@@ -148,6 +151,12 @@ public class UserServiceImpl implements UserService {
 
         user.setProfilePic("/profile-pic/" + fileName);
         searchUser.setProfilePic(user.getProfilePic());
+
+        if (streamUser.isPresent() && streamUser != null){
+            StreamSearch streamSearch = streamUser.get();
+            streamSearch.setStreamerName(newName);
+            streamSearch.setStreamerProfilePic(user.getProfilePic());
+        }
 
         userRepository.save(user);
         searchUserRepository.save(searchUser);

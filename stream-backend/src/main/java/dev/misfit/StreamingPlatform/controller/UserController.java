@@ -50,9 +50,9 @@ public class UserController {
             @AuthenticationPrincipal JwtUserPrincipal user
     ) throws IOException {
         Long userId = user.getClaims().get("userId", Long.class);
-        if (profile == null) {
-            return;
-        }
+//        if (profile == null) {
+//            return;
+//        }
         service.completeProfile(userId, profile, newName);
     }
 

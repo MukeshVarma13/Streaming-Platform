@@ -35,6 +35,7 @@ import { UserContext } from "./context/UserDetailsContext";
 import JoinServer from "./components/JoinServer";
 import CompleteProfile from "./pages/CompleteProfile";
 import EditProfile from "./components/EditProfile";
+import Followers from "./pages/Followers";
 
 const App = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -94,34 +95,32 @@ const App = () => {
         } pl-3`}
       >
         <Routes>
-          <Route index element={<Home />} /> {/*Done*/}
-          <Route path="/following" element={<Following />} /> {/*Not Done*/}
-          <Route path="/search" element={<Search />} /> {/*Done*/}
+          <Route index element={<Home />} />
+          <Route path="/following" element={<Following />} />
+          <Route path="/followers" element={<Followers />} />
+          <Route path="/search" element={<Search />} />
           <Route path="/channel/:id" element={<Channel />}>
-            <Route index element={<ChannelHome />} /> {/*Done*/}
-            <Route path="about" element={<ChannelAbout />} /> {/*Not Done*/}
-            <Route path="videos" element={<ChannelVideos />} /> {/*Done*/}
+            <Route index element={<ChannelHome />} />
+            <Route path="about" element={<ChannelAbout />} />
+            <Route path="videos" element={<ChannelVideos />} />
           </Route>
           <Route
             path="/community/channel/:channelId"
             element={<CommunityApp />}
           />
           <Route path="/community/voice/:id" element={<VoiceChannelStage />} />
-          {/*Done*/}
           <Route path="/stream" element={<Stream />}>
-            <Route index element={<StartStream />} /> {/*Done*/}
-            <Route path="preview" element={<StreamPreview />} /> {/*Done*/}
-            <Route path="dashboard" element={<Dashboard />} /> {/*Done*/}
+            <Route index element={<StartStream />} />
+            <Route path="preview" element={<StreamPreview />} />
+            <Route path="dashboard" element={<Dashboard />} />
           </Route>
-          <Route path="/setting" element={<Settings />} /> {/*Not Done*/}
+          <Route path="/setting" element={<Settings />} />
           <Route path="/stream/:streamId" element={<WatchStream />} />
-          {/*Done*/}
-          <Route path="/directory/:name" element={<Directory />} /> {/*Done*/}
+          <Route path="/directory/:name" element={<Directory />} />
           <Route path="/directory/tag/:category" element={<Category />}>
-            <Route index element={<CategoryChannels />} /> {/*Not Done*/}
-            <Route path="all" element={<CategoryVideos />} /> {/*Not Done*/}
+            <Route index element={<CategoryChannels />} />
+            {/* <Route path="all" element={<CategoryVideos />} /> */}
           </Route>
-          {/*Need to add videos*/}
           <Route path="/edit-profile" element={<EditProfile />} />
           <Route path="/auth" element={<AuthPage />}>
             <Route index element={<Login />} />
@@ -129,9 +128,8 @@ const App = () => {
             <Route path="verify-otp" element={<OtpVerify />} />
           </Route>
           <Route path="/auth/complete-profile" element={<CompleteProfile />} />
-          {/*Done*/}
-          <Route path="/library" element={<Library />} /> {/*Not Done*/}
-          <Route path="*" element={<ErrorPage />} /> {/*Done*/}
+          <Route path="/library" element={<Library />} />
+          <Route path="*" element={<ErrorPage />} />
         </Routes>
       </div>
     </div>
