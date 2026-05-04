@@ -52,8 +52,8 @@ public class StreamServiceImpl implements StreamService {
 
     @Value("${videos.path}")
     String videoPath;
-    @Value("${wsl.path}")
-    String wslPath;
+//    @Value("${wsl.path}")
+//    String wslPath;
 
     public StreamServiceImpl(
             StreamRepository repository,

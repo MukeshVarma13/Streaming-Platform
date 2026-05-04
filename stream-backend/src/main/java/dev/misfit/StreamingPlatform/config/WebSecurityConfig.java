@@ -79,7 +79,11 @@ public class WebSecurityConfig {
 
     private UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173", "https://1zpqzjbl-5173.inc1.devtunnels.ms", "http://localhost:5174"));
+        config.setAllowedOrigins(List.of(
+                "http://localhost:5173",
+                "http://streaming-frontend:5173",
+                "http://localhost:5174")
+        );
         config.setAllowedOriginPatterns(List.of("*"));
         config.setAllowedMethods(List.of("GET", "POST", "DELETE", "PUT", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("*"));

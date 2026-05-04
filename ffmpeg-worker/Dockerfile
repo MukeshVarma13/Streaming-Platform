@@ -12,6 +12,9 @@ COPY . .
 
 RUN mkdir -p /worker/input /worker/output
 
+VOLUME /worker/input
+VOLUME /worker/output
+
 EXPOSE 5000
 
 CMD ["python", "worker.py"]

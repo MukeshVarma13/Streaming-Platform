@@ -31,7 +31,7 @@ const CompleteProfile = () => {
   const { mutate, isPending, error } = useMutation({
     mutationFn: (formData) => completeProfile(formData),
     onSuccess: (data) => {
-      navigate("/");
+      navigate("/auth");
     },
     onError: (err) => {
       console.error(err);
