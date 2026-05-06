@@ -3,5 +3,5 @@ Videos/
 recordings/
 *.flv
 *.mp4
-/docs
+docs/
 .env
