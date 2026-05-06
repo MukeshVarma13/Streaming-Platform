@@ -9,6 +9,7 @@ import dev.misfit.StreamingPlatform.customExceptions.StreamKeyNotFoundException;
 import dev.misfit.StreamingPlatform.customExceptions.StreamProcessingException;
 import dev.misfit.StreamingPlatform.services.StreamService;
 import dev.misfit.StreamingPlatform.utils.JwtUserPrincipal;
+import dev.misfit.StreamingPlatform.utils.StreamStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -53,7 +54,7 @@ public class StreamController {
     //    Authenticate stream key for NGINX on_publish
     //    on_publish http://localhost:8080/api/auth/publish
     @PostMapping("/auth/publish")
-    public ResponseEntity<Void> authenticatePublish(@RequestParam Map<String, String> param) {
+    public ResponseEntity<StreamStatus> authenticatePublish(@RequestParam Map<String, String> param) {
         boolean keyPresent = service.authenticatePublish(param);
         if (keyPresent) {
             return ResponseEntity.ok().build();

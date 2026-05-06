@@ -20,7 +20,7 @@ public interface StreamSearchService {
 
     PageResponse<StreamSearch> searchInTitle(String term, Pageable pageable);
 
-    PageResponse<StreamSearch> searchByTag(String term, Pageable pageable);
+    PageResponse<StreamSearch> searchByTag(String term,String status, Pageable pageable);
 
     PageResponse<StreamSearch> searchByCategory(String term, Pageable pageable);
 

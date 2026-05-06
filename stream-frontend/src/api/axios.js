@@ -1,7 +1,6 @@
 import axios from "axios";
 
 export const baseURL = "http://localhost:8080";
-export const streamURL = "http://localhost:8000";
 
 export const http = axios.create({
   baseURL: baseURL,
@@ -29,6 +28,3 @@ http.interceptors.request.use((config) => {
   }
 });
 
-export const axiosLive = axios.create({
-  streamURL: streamURL,
-});

@@ -20,7 +20,7 @@ const VideoCard = ({ stream }) => {
       <div className="flex gap-2 capitalize items-center">
         <NavLink
           to={`/channel/${stream?.streamerId}`}
-          className="w-12 h-12 rounded-full flex items-center justify-center"
+          className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
         >
           {stream?.streamerProfilePic ? (
             <img
@@ -58,7 +58,7 @@ const VideoCard = ({ stream }) => {
                   className="bg-[#29292E] rounded-2xl px-2 capitalize text-center cursor-pointer"
                   key={index}
                   onClick={() => {
-                    navigate(`/directory/tag/${tag}`);
+                    stream.status === "LIVE" ?  navigate(`/directory/tag/${tag}`) : navigate(`/directory/tag/${tag}/all`)
                   }}
                 >
                   {tag}

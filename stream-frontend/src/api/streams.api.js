@@ -66,8 +66,8 @@ export const getByCategories = (term, pageParam = 0) => {
 };
 
 // Get streams by Tag
-export const getByTags = (term, pageParam = 0) => {
-  return http.get(`api/v1/search/tag?term=${term}&page=${pageParam}&size=15`);
+export const getByTags = ({category, type}, pageParam = 0) => {
+  return http.get(`api/v1/search/tag?term=${category}&status=${type}&page=${pageParam}&size=15`);
 };
 
 // Generate stream key

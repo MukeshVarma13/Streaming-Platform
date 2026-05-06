@@ -1,7 +1,7 @@
 import VideoComponent from "../components/VideoComponent";
 import Comments from "../components/comments/Comments";
 import { useParams } from "react-router";
-import { baseURL, streamURL } from "../api/axios";
+import { baseURL } from "../api/axios";
 import ChannelContainer from "../components/channelContainer/ChannelContainer";
 import Description from "../components/description/Description";
 import { useQuery } from "@tanstack/react-query";
@@ -59,11 +59,6 @@ const WatchStream = () => {
     );
   }
 
-  const videoSrc =
-    streamData.streamSearch?.status === "LIVE"
-      ? streamURL + streamData.streamSearch?.url
-      : baseURL + streamData.streamSearch?.url;
-
   return (
     <div className="fixed left-0 right-0 top-0 bottom-0 h-screen w-screen md:pl-52 md:pt-16 pt-2 overflow-hidden">
       <div
@@ -85,7 +80,7 @@ const WatchStream = () => {
                 <RiExpandLeftLine size={22} />
               </button>
               <VideoComponent
-                videoURL={videoSrc}
+                videoURL={baseURL + streamData.streamSearch?.url}
                 thumbnail={baseURL + streamData.streamSearch?.thumbnail}
               />
             </div>

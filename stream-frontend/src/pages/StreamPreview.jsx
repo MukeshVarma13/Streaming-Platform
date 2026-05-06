@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router";
 import VideoComponent from "../components/VideoComponent";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { goLive, streamStatus } from "../api/streams.api";
-import { streamURL } from "../api/axios";
+import { baseURL } from "../api/axios";
 
 export default function StreamPreview() {
   const [copied, setCopied] = useState(false);
@@ -23,7 +23,7 @@ export default function StreamPreview() {
     queryKey: ["live-stream-status", streamId],
     enabled: !!streamId,
     queryFn: () => streamStatus(streamData.streamKey).then((res) => res.data),
-    refetchInterval: 5000,
+    refetchInterval: 3000,
   });
 
   const { mutate, isPending, isSuccess, isError, error } = useMutation({
@@ -135,14 +135,14 @@ export default function StreamPreview() {
           <h2 className="text-xl font-bold mb-4">Ready to Go Live</h2>
 
           <div className="h-64 bg-theme border border-gray-700 rounded-xl flex items-center justify-center text-gray-500 mb-6 overflow-hidden">
-            {!obsConnected ? (
+            {!obsConnected != "PROCESSING" ? (
               <div className="text-center">
                 <div className="mb-2">Waiting for OBS signal...</div>
                 <div className="text-xs text-gray-400">Checking...</div>
               </div>
             ) : (
               <VideoComponent
-                videoURL={streamURL + streamData?.url}
+                videoURL={baseURL + streamData?.url}
                 control={false}
               />
             )}

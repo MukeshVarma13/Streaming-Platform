@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class RedisStream {
     private String title;
+    private Long streamerId;
     private String description;
     private String streamKey;
     private StreamStatus status;

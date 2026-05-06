@@ -101,9 +101,49 @@ public class StreamSearchServiceImpl implements StreamSearchService {
     }
 
     @Override
-    public PageResponse<StreamSearch> searchByTag(String term, Pageable pageable) {
-        return new PageResponse<>(mapToPage(nonFuzzyStream(term, "tags", pageable), pageable));
+    public PageResponse<StreamSearch> searchByTag(String term,String status, Pageable pageable) {
+        String streamStatus = status.toUpperCase();
+        NativeQuery query = NativeQuery.builder()
+                .withQuery(q -> q
+                        .bool(b -> b
+                                // The primary logic including scoring
+                                .must(m -> m
+                                        .functionScore(fs -> fs
+                                                .query(inner -> inner
+                                                        .term(t -> t
+                                                                .field("tags")
+                                                                .value(term)
+                                                                .caseInsensitive(true)
+                                                        )
+                                                )
+                                                .functions(f -> f
+                                                        .fieldValueFactor(fvf -> fvf
+                                                                .field("popularityScore")
+                                                                .factor(1.2)
+                                                                .modifier(FieldValueFactorModifier.Log1p)
+                                                                .missing(1.0)
+                                                        )
+                                                )
+                                                .boostMode(FunctionBoostMode.Sum)
+                                                .scoreMode(FunctionScoreMode.Sum)
+                                        )
+                                )
+                                // The hard filter condition (no impact on score)
+                                .filter(f -> f
+                                        .term(t -> t
+                                                .field("status")
+                                                .value(streamStatus)
+                                        )
+                                )
+                        )
+                )
+                .withPageable(pageable)
+                .build();
+
+        SearchHits<StreamSearch> search = operations.search(query, StreamSearch.class);
+        return new PageResponse<>(mapToPage(search, pageable));
     }
+
 
     @Override
     public PageResponse<StreamSearch> searchByCategory(String term, Pageable pageable) {

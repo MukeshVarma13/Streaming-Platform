@@ -17,9 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
-import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -33,11 +31,11 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.security.SecureRandom;
 import java.time.Instant;
-import java.util.Base64;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static org.apache.tomcat.util.http.fileupload.FileUtils.deleteDirectory;
 
 @Service
 public class StreamServiceImpl implements StreamService {
@@ -49,17 +47,18 @@ public class StreamServiceImpl implements StreamService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final StreamSearchRepository searchStreamRepository;
     private final SearchUserRepository searchUserRepository;
+    private final AsyncProcessService asyncProcessService;
 
     @Value("${videos.path}")
     String videoPath;
-//    @Value("${wsl.path}")
-//    String wslPath;
+    @Value("${live.videos.path}")
+    String liveVideoUrl;
 
     public StreamServiceImpl(
             StreamRepository repository,
             UserRepository userRepository,
             RestClient restClient,
-            RedisTemplate<String, Object> redisTemplate, StreamSearchRepository searchStreamRepository, SearchUserRepository searchUserRepository
+            RedisTemplate<String, Object> redisTemplate, StreamSearchRepository searchStreamRepository, SearchUserRepository searchUserRepository, AsyncProcessService asyncProcessService
     ) {
         this.streamRepository = repository;
         this.userRepository = userRepository;
@@ -67,6 +66,7 @@ public class StreamServiceImpl implements StreamService {
         this.redisTemplate = redisTemplate;
         this.searchStreamRepository = searchStreamRepository;
         this.searchUserRepository = searchUserRepository;
+        this.asyncProcessService = asyncProcessService;
     }
 
     @Override
@@ -109,10 +109,10 @@ public class StreamServiceImpl implements StreamService {
 
         String thumbnailPath = "/thumbnail/" + userId + "/" + request.getStreamKey() + "/" + thumbnailOriginalFilename;
 
-        Stream stream = convertToStream(request, thumbnailPath);
+        Stream stream = convertToStream(request, thumbnailPath, user);
         RedisStream redisStream = convertToRedisStream(stream);
 
-        redisTemplate.opsForValue().set(userId + ":" + stream.getStreamKey(), redisStream, 10, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set("stream:" + stream.getStreamKey(), redisStream, 10, TimeUnit.MINUTES);
 
         return convertToResponse(stream);
     }
@@ -123,6 +123,7 @@ public class StreamServiceImpl implements StreamService {
                 .description(stream.getDescription())
                 .streamKey(stream.getStreamKey())
                 .status(stream.getStatus())
+                .streamerId(stream.getStreamer().getUserId())
                 .url(stream.getUrl())
                 .thumbnail(stream.getThumbnail())
                 .categories(stream.getCategories())
@@ -139,12 +140,7 @@ public class StreamServiceImpl implements StreamService {
             return false;
         }
 
-        String redisKey = findRedisKeyByStreamKey(streamKey);
-        if (redisKey == null) {
-            log.warn("Stream not available in redis: {}", streamKey);
-            return false;
-        }
-
+        String redisKey = "stream:" + streamKey;
         RedisStream stream = (RedisStream) redisTemplate.opsForValue().get(redisKey);
         if (stream == null) {
             log.warn("Stream expired from redis: {}", streamKey);
@@ -157,21 +153,21 @@ public class StreamServiceImpl implements StreamService {
         }
 
         stream.setStatus(StreamStatus.PROCESSING);
+        redisTemplate.opsForValue().set(redisKey, stream, 10, TimeUnit.MINUTES);
 
-        Long ttl = redisTemplate.getExpire(redisKey, TimeUnit.MINUTES);
-        if (ttl != null && ttl > 0) {
-            redisTemplate.opsForValue().set(redisKey, stream, ttl, TimeUnit.MINUTES);
-        } else {
-            redisTemplate.opsForValue().set(redisKey, stream);
-        }
+        FFMpegRequest request = new FFMpegRequest(
+                streamKey,
+                String.valueOf(stream.getStreamerId())
+        );
 
+        asyncProcessService.pushStreamProcessing(request);
         log.info("StreamKey {} moved to PROCESSING", streamKey);
         return true;
     }
 
     @Override
     public StreamStatus streamStatus(String streamKey, Long userId) {
-        RedisStream stream = (RedisStream) redisTemplate.opsForValue().get(userId + ":" + streamKey);
+        RedisStream stream = (RedisStream) redisTemplate.opsForValue().get("stream:" + streamKey);
         if (stream == null) {
             Stream streamInDb = streamRepository.findByStreamKey(streamKey)
                     .orElseThrow(() -> new StreamKeyNotFoundException("Stream not found"));
@@ -198,7 +194,7 @@ public class StreamServiceImpl implements StreamService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new InvalidUserException("User not found of id " + userId));
 
-        RedisStream redisStream = (RedisStream) redisTemplate.opsForValue().get(userId + ":" + streamKey);
+        RedisStream redisStream = (RedisStream) redisTemplate.opsForValue().get("stream:" + streamKey);
 
         if (redisStream == null) {
             throw new StreamKeyNotFoundException("No stream found for the provided key " + streamKey);
@@ -219,22 +215,10 @@ public class StreamServiceImpl implements StreamService {
         searchUserRepository.save(convertToSearchUser(user));
         searchStreamRepository.save(convertToStreamSearch(stream));
 
-        redisTemplate.delete(userId + ":" + streamKey);
+        redisTemplate.delete("stream:" + streamKey);
+        log.info("stream is live for the key: {}", streamKey);
 
         return convertToResponse(stream);
-    }
-
-    private Stream convertFromRedisStreamToStream(RedisStream redisStream) {
-        return Stream.builder()
-                .title(redisStream.getTitle())
-                .description(redisStream.getDescription())
-                .streamKey(redisStream.getStreamKey())
-                .status(redisStream.getStatus())
-                .url(redisStream.getUrl())
-                .thumbnail(redisStream.getThumbnail())
-                .categories(redisStream.getCategories())
-                .tags(redisStream.getTags())
-                .build();
     }
 
     @Override
@@ -252,32 +236,26 @@ public class StreamServiceImpl implements StreamService {
             log.info("Stream already ended for key {} — ignoring duplicate call.", streamKey);
             return;
         }
-
         stream.setEndedAt(Instant.now());
         stream.setStatus(StreamStatus.ENDED);
-
-        String streamerId = stream.getStreamer().getUserId().toString();
-        String outputFolder = videoPath + "/" + streamerId + "/" + streamKey;
-        stream.setUrl("/api/videos/" + streamerId + "/" + streamKey + "/" + streamKey + ".m3u8");
         searchStreamRepository.save(convertToStreamSearch(stream));
-
-        new File(outputFolder).mkdirs();
-
-        try {
-            FFMpegResponse ffMpegResponse = ffmpegConverter(
-                    new FFMpegRequest(streamKey, streamerId)
-            );
-        } catch (RecordingNotFoundException notFoundException) {
-            log.error(notFoundException.getMessage());
-            stream.setStatus(StreamStatus.FAILED);
-        } catch (FFmpegFailedException ex) {
-            log.error("{}retrying", ex.getMessage());
-            // Retrying again to convert stream to hls (implement later)
-            streamRepository.save(stream);
-            throw new StreamProcessingException("couldn't convert the stream! for streamKey " + streamKey);
-        }
         streamRepository.save(stream);
-        log.info("Stream conversion completed and record updated for: {}", streamKey);
+        log.info("stream ended with the key: {}", streamKey);
+        asyncProcessService.stopStream(streamKey);
+        log.info("Worker stopped gracefully: {}", streamKey);
+    }
+
+    private Stream convertFromRedisStreamToStream(RedisStream redisStream) {
+        return Stream.builder()
+                .title(redisStream.getTitle())
+                .description(redisStream.getDescription())
+                .streamKey(redisStream.getStreamKey())
+                .status(redisStream.getStatus())
+                .url(redisStream.getUrl())
+                .thumbnail(redisStream.getThumbnail())
+                .categories(redisStream.getCategories())
+                .tags(redisStream.getTags())
+                .build();
     }
 
     private FFMpegResponse ffmpegConverter(FFMpegRequest request) {
@@ -295,23 +273,6 @@ public class StreamServiceImpl implements StreamService {
                 .body(FFMpegResponse.class);
     }
 
-    private String findRedisKeyByStreamKey(String streamKey) {
-
-        ScanOptions options = ScanOptions.scanOptions()
-                .match("*:" + streamKey)
-                .count(10)
-                .build();
-
-        try (Cursor<byte[]> cursor = redisTemplate.executeWithStickyConnection(
-                connection -> connection.scan(options))) {
-
-            while (cursor.hasNext()) {
-                return new String(cursor.next());
-            }
-        }
-        return null;
-    }
-
     private StartStreamResponse convertToResponse(Stream stream) {
         return StartStreamResponse.builder()
                 .streamId(stream.getId())
@@ -325,13 +286,14 @@ public class StreamServiceImpl implements StreamService {
                 .build();
     }
 
-    private Stream convertToStream(StartStreamRequest request, String thumbnailPath) {
+    private Stream convertToStream(StartStreamRequest request, String thumbnailPath, User user) {
         return Stream.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .status(StreamStatus.PENDING)
+                .streamer(user)
                 .streamKey(request.getStreamKey())
-                .url("/hls/" + request.getStreamKey() + ".m3u8")
+                .url("/api/videos/" + user.getUserId() + "/" + request.getStreamKey() + "/" + request.getStreamKey() + ".m3u8")
                 .thumbnail(thumbnailPath)
                 .tags(request.getTags())
                 .categories(request.getCategories())

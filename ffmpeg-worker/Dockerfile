@@ -10,9 +10,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN mkdir -p /worker/input /worker/output
+RUN mkdir -p /worker/output
 
-VOLUME /worker/input
+# VOLUME /worker/input
 VOLUME /worker/output
 
 EXPOSE 5000

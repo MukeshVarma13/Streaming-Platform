@@ -6,6 +6,7 @@ import dev.misfit.StreamingPlatform.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -27,6 +28,7 @@ public class OTPService {
         this.userRepository = userRepository;
     }
 
+    @Async
     public String generateOtp(String email) {
         Optional<User> userExists = userRepository.findByEmailIgnoreCase(email);
         if (userExists.isPresent()) {
@@ -41,6 +43,7 @@ public class OTPService {
         return sendEmail(email, subject, content);
     }
 
+    @Async
     public boolean validateOtp(String email, String otp) {
         if (!otpStore.containsKey(email)) return false;
         if (otpExpiry.get(email) < System.currentTimeMillis()) {

@@ -17,7 +17,7 @@ import VideoComponent from "../components/VideoComponent";
 import { useLocation } from "react-router";
 import { useStreamChat } from "../context/useStreamChat";
 import ViewerCount from "../components/ViewerCount";
-import { baseURL, streamURL } from "../api/axios";
+import { baseURL } from "../api/axios";
 import { streamComplete } from "../api/streams.api";
 
 export default function Dashboard() {
@@ -118,7 +118,7 @@ export default function Dashboard() {
         <div className="rounded-2xl flex-1 border border-white/10 bg-black/30 backdrop-blur-xl shadow-[0_0_40px_rgba(0,0,0,0.4)] overflow-hidden relative max-h-fit hover-theme">
           <div className="aspect-video">
             <VideoComponent
-              videoURL={streamURL + streamData?.url}
+              videoURL={baseURL + streamData?.url}
               thumbnail={baseURL + streamData?.thumbnail}
               control={true}
             />

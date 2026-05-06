@@ -13,5 +13,5 @@ import java.util.Optional;
 public interface StreamSearchRepository extends ElasticsearchRepository<StreamSearch, Long> {
     Page<StreamSearch> findByStatus(StreamStatus streamStatus, Pageable pageable);
     Page<StreamSearch> findByStreamerId(Long userId, Pageable pageable);
-    Optional<StreamSearch> findByStreamerId(Long userId);
+    List<StreamSearch> findByStreamerId(Long userId);
 }

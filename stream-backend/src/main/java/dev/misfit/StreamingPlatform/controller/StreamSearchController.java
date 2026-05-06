@@ -61,10 +61,11 @@ public class StreamSearchController {
     @GetMapping("/tag")
     public ResponseEntity<?> searchByTag(
             @RequestParam(name = "term", required = true) String term,
+            @RequestParam(name = "status", required = true) String status,
             @PageableDefault(size = 15) Pageable pageable
     ) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(service.searchByTag(term, pageable));
+                .body(service.searchByTag(term, status, pageable));
     }
 
     // Search streams based on category

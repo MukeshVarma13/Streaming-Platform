@@ -115,7 +115,7 @@ export default function SearchBar() {
                     <div
                       key={v.id}
                       className="p-2 hover:text-gray-900 hover:bg-gray-100 rounded cursor-pointer"
-                      onClick={() => navigate(`/watch/${v.id}`)}
+                      onClick={() => navigate(`/stream/${v.id}`)}
                     >
                       {v.title}
                     </div>

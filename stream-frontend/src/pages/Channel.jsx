@@ -1,6 +1,6 @@
 import { NavLink, Outlet, useParams } from "react-router";
 import VideoComponent from "../components/VideoComponent";
-import { streamURL } from "../api/axios";
+import { baseURL } from "../api/axios";
 import ChannelUserDetail from "../components/ChannelUserDetail";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { getstreamerDetails } from "../api/streams.api";
@@ -50,10 +50,7 @@ const Channel = () => {
   return (
     <div className="w-full relative pr-4">
       {latestStream?.status == "LIVE" ? (
-        <VideoComponent
-          videoURL={streamURL + latestStream.url}
-          control={false}
-        />
+        <VideoComponent videoURL={baseURL + latestStream.url} control={false} />
       ) : (
         <img
           src="/profile.jpeg"

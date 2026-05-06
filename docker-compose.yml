@@ -10,7 +10,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      DATABASE_URL: jdbc:mysql://mysql-db:3308/streaming_platform
+      DATABASE_URL: jdbc:mysql://mysql:3308/streaming_platform
       DATABASE_USERNAME: root
       DATABASE_PASSWORD: test
       REDIS_HOST: redis-cache
@@ -19,13 +19,14 @@ services:
       ELASTICSEARCH_USERNAME: root
       ELASTICSEARCH_PASSWORD: test
       FFMPEG_URL: http://stream-converter:5000
-      JWT_SECRET_KEY: 5c990cfd4f3c3b57b61107ebc5e1d44367586d2d2b170e4bf5bfbb1c613b3470
-      MAIL_LOST: smtp.gmail.com
-      MAIL_USERNAME: misfit.dev.13@gmail.com
-      MAIL_PASSWORD: hgjwouvpepzfyeff
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      MAIL_LOST: ${MAIL_LOST}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
     volumes:
       - E:/FullStack-Learning/StreamingPlatform/Videos:/videos
       - E:/FullStack-Learning/StreamingPlatform/profile-pic:/profile-pics
+      - E:/FullStack-Learning/StreamingPlatform/nginx-live-videos:/nginx-live-path
 
   frontend:
     build: ./stream-frontend
@@ -35,26 +36,28 @@ services:
 
   nginx-rtmp:
     build: ./nginx-rtmp
-    container_name: rtmp-server
+    container_name: nginx-rtmp
     ports:
       - "1935:1935"
-      - "8000:8080"
-    volumes:
-      - E:/FullStack-Learning/StreamingPlatform/recordings:/tmp/recordings
-      - E:/FullStack-Learning/StreamingPlatform/nginx-live-videos:/mnt/hls/
+      # - "8000:8080"
+    # volumes:
+      # - E:/FullStack-Learning/StreamingPlatform/recordings:/tmp/recordings
+      # - E:/FullStack-Learning/StreamingPlatform/nginx-live-videos:/mnt/hls/
     extra_hosts:
     - "host.docker.internal:host-gateway"
 
   ffmpeg-worker:
     build: ./ffmpeg-worker
-    container_name: stream-converter
+    container_name: ffmpeg-worker
     ports:
       - "5000:5000"
     volumes:
-      - E:/FullStack-Learning/StreamingPlatform/Videos:/worker/output
-      - E:/FullStack-Learning/StreamingPlatform/recordings:/worker/input
+      - E:/FullStack-Learning/StreamingPlatform/Videos:/worker/output 
     environment:
       REDIS_HOST: redis
+      PYTHONUNBUFFERED: 1
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
 
   redis:
     image: redis:alpine
@@ -64,7 +67,7 @@ services:
 
   mysql:
     image: mysql:8
-    container_name: mysql-db
+    container_name: mysql
     ports:
       - "3308:3306"
     environment:
@@ -75,7 +78,7 @@ services:
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.9
-    container_name: search-searvice
+    container_name: elasticsearch
     environment:
       discovery.type: single-node
       xpack.security.enabled: false
@@ -84,6 +87,17 @@ services:
     volumes:
       - es-data:/usr/share/elasticsearch/data
 
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.9
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch
+
 volumes:
   mysql-data:
   es-data:
+  

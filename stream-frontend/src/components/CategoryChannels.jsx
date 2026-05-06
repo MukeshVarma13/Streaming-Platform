@@ -6,6 +6,10 @@ import VideosCardSkeleton from "./videosContainer/VideosCardSkeleton";
 
 const CategoryChannels = () => {
   const { category } = useOutletContext();
+  const fileds = {
+    category,
+    type: "LIVE"
+  }
   // console.log(category);
 
   const {
@@ -18,7 +22,7 @@ const CategoryChannels = () => {
     isFetching,
     ref: observerRef,
     inView,
-  } = useInfiniteScrollContext(getByTags, category, "tag-streams", false);
+  } = useInfiniteScrollContext(getByTags, fileds, "tag-streams", false);
 
   const streams = data?.pages?.flatMap((page) => page.content) ?? [];
 
@@ -37,6 +41,7 @@ const CategoryChannels = () => {
       </div>
     );
   }
+
 
   return (
     <div className="w-full h-full flex flex-col">

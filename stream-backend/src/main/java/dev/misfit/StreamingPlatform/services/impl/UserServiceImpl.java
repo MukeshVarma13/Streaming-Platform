@@ -14,6 +14,7 @@ import dev.misfit.StreamingPlatform.repositories.StreamSearchRepository;
 import dev.misfit.StreamingPlatform.repositories.UserRepository;
 import dev.misfit.StreamingPlatform.services.UserService;
 import dev.misfit.StreamingPlatform.utils.JwtUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -111,8 +113,6 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmailIgnoreCase(loginRequest.getEmail())
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-//        Path profilePath = Path.of(profilePicPath, user.getProfilePic());
-
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(),
@@ -137,7 +137,7 @@ public class UserServiceImpl implements UserService {
         SearchUser searchUser = searchUserRepository.findById(user.getUserId())
                 .orElseThrow(() -> new UserNotFoundException("User not found in Es"));
 
-        Optional<StreamSearch> streamUser = streamSearchRepository.findByStreamerId(user.getUserId());
+        List<StreamSearch> streamUser = streamSearchRepository.findByStreamerId(user.getUserId());
 
         Path uploadDir = Path.of(profilePicPath);
         Files.createDirectories(uploadDir);
@@ -152,10 +152,14 @@ public class UserServiceImpl implements UserService {
         user.setProfilePic("/profile-pic/" + fileName);
         searchUser.setProfilePic(user.getProfilePic());
 
-        if (streamUser.isPresent() && streamUser != null){
-            StreamSearch streamSearch = streamUser.get();
-            streamSearch.setStreamerName(newName);
-            streamSearch.setStreamerProfilePic(user.getProfilePic());
+        if (!streamUser.isEmpty()) {
+            streamUser.stream().map(u -> {
+                u.setStreamerName(newName);
+                u.setStreamerProfilePic(user.getProfilePic());
+                streamSearchRepository.save(u);
+                return u;
+            }).toList();
+            log.info("Profile Updated SuccessFully!");
         }
 
         userRepository.save(user);

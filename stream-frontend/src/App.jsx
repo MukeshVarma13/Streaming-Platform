@@ -119,7 +119,7 @@ const App = () => {
           <Route path="/directory/:name" element={<Directory />} />
           <Route path="/directory/tag/:category" element={<Category />}>
             <Route index element={<CategoryChannels />} />
-            {/* <Route path="all" element={<CategoryVideos />} /> */}
+            <Route path="all" element={<CategoryVideos />} />
           </Route>
           <Route path="/edit-profile" element={<EditProfile />} />
           <Route path="/auth" element={<AuthPage />}>

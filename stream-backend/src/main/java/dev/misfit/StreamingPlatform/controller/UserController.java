@@ -8,6 +8,8 @@ import dev.misfit.StreamingPlatform.services.OTPService;
 import dev.misfit.StreamingPlatform.services.TempVerificationService;
 import dev.misfit.StreamingPlatform.services.UserService;
 import dev.misfit.StreamingPlatform.utils.JwtUserPrincipal;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,16 +46,14 @@ public class UserController {
     }
 
     @PostMapping("/complete-profile")
-    public void completeProfile(
+    public ResponseEntity<Void> completeProfile(
             @RequestParam("profile") MultipartFile profile,
             @RequestParam(value = "name" ,required = false) String newName,
             @AuthenticationPrincipal JwtUserPrincipal user
     ) throws IOException {
         Long userId = user.getClaims().get("userId", Long.class);
-//        if (profile == null) {
-//            return;
-//        }
         service.completeProfile(userId, profile, newName);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
     // STEP 1: Send OTP
