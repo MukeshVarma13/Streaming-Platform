@@ -1,5 +1,4 @@
 services:
-
   backend:
     build: ./stream-backend
     container_name: streaming-backend
@@ -10,29 +9,28 @@ services:
     ports:
       - "8080:8080"
     environment:
-      DATABASE_URL: jdbc:mysql://mysql:3308/streaming_platform
+      DATABASE_URL: jdbc:mysql://mysql:3306/streaming_platform
       DATABASE_USERNAME: root
       DATABASE_PASSWORD: test
-      REDIS_HOST: redis-cache
+      REDIS_HOST: redis
       REDIS_PORT: 6379
-      ELASTICSEARCH_URL: search-searvice:9200
+      ELASTICSEARCH_URL: elasticsearch:9200
       ELASTICSEARCH_USERNAME: root
       ELASTICSEARCH_PASSWORD: test
-      FFMPEG_URL: http://stream-converter:5000
+      FFMPEG_URL: http://ffmpeg-worker:5000
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       MAIL_LOST: ${MAIL_LOST}
       MAIL_USERNAME: ${MAIL_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
     volumes:
-      - E:/FullStack-Learning/StreamingPlatform/Videos:/videos
-      - E:/FullStack-Learning/StreamingPlatform/profile-pic:/profile-pics
-      - E:/FullStack-Learning/StreamingPlatform/nginx-live-videos:/nginx-live-path
+      - videos-data:/videos
+      - profile-pics-data:/profile-pics
 
   frontend:
     build: ./stream-frontend
     container_name: streaming-frontend
     ports:
-      - "5173:3000"
+      - "5173:80"
 
   nginx-rtmp:
     build: ./nginx-rtmp
@@ -41,10 +39,10 @@ services:
       - "1935:1935"
       # - "8000:8080"
     # volumes:
-      # - E:/FullStack-Learning/StreamingPlatform/recordings:/tmp/recordings
-      # - E:/FullStack-Learning/StreamingPlatform/nginx-live-videos:/mnt/hls/
+    # - E:/FullStack-Learning/StreamingPlatform/recordings:/tmp/recordings
+    # - E:/FullStack-Learning/StreamingPlatform/nginx-live-videos:/mnt/hls/
     extra_hosts:
-    - "host.docker.internal:host-gateway"
+      - "host.docker.internal:host-gateway"
 
   ffmpeg-worker:
     build: ./ffmpeg-worker
@@ -52,16 +50,16 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - E:/FullStack-Learning/StreamingPlatform/Videos:/worker/output 
+      - videos-data:/worker/output
     environment:
       REDIS_HOST: redis
       PYTHONUNBUFFERED: 1
     extra_hosts:
-    - "host.docker.internal:host-gateway"
+      - "host.docker.internal:host-gateway"
 
   redis:
     image: redis:alpine
-    container_name: redis-cache
+    container_name: redis
     ports:
       - "6379:6379"
 
@@ -100,4 +98,5 @@ services:
 volumes:
   mysql-data:
   es-data:
-  
+  videos-data:
+  profile-pics-data:

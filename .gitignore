@@ -4,4 +4,5 @@ recordings/
 *.flv
 *.mp4
 docs/
+diagrams/
 .env

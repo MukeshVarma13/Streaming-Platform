@@ -32,8 +32,8 @@ public class VideoController {
 
     @Value("${videos.path}")
     private String recordedVideoUrl;
-    @Value("${live.videos.path}")
-    private String liveVideoUrl;
+//    @Value("${live.videos.path}")
+//    private String liveVideoUrl;
 
     private final StreamRepository streamRepository;
 

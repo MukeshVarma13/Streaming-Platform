@@ -18,6 +18,5 @@ EXPOSE 8080
 
 VOLUME /videos
 VOLUME /profile-pics
-VOLUME /nginx-live-path
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
