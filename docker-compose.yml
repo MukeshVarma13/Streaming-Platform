@@ -19,7 +19,7 @@ services:
       ELASTICSEARCH_PASSWORD: test
       FFMPEG_URL: http://ffmpeg-worker:5000
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
-      MAIL_LOST: ${MAIL_LOST}
+      MAIL_HOST: ${MAIL_HOST}
       MAIL_USERNAME: ${MAIL_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
     volumes:
